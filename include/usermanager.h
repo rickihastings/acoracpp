@@ -25,6 +25,9 @@ public:
 	UserManager();
 	// destructor
 	virtual ~UserManager();
+	
+	// handle connect
+	virtual void handleConnect(String&, String&, String&, String&, String&, String&, String&, String&, String&, String&);
 };
 
 #endif // USERMANAGER_H

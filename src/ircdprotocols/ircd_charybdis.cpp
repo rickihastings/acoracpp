@@ -20,13 +20,15 @@
 #include "socketengine.h"
 #include "config.h"
 #include "exception.h"
+#include "usermanager.h"
+#include "channelmanager.h"
 
 #include <iostream>
 #include <algorithm>
 
 // IRCD COMMANDS
 
-// PING
+// :<source> PING :<reply>
 class IRCdCommandPing : public IRCdCommand
 {
 	public:
@@ -36,10 +38,17 @@ class IRCdCommandPing : public IRCdCommand
 		{
 			// :<sid> PONG :<reply>
 			instance->socketEngine->sendString(":" + charybdis::ircd->sid + " PONG :" + params.at(0));
+			
+			if (instance->ircdProtocol->duringBurst)
+			{
+				instance->ircdProtocol->duringBurst = false;
+				instance->ircdProtocol->finishedBurst = true;
+			}
+			// we recieve our first PING to tell us that the burst has finished.
 		}
 };
 
-// NOTICE (hacked)
+// :<source> NOTICE <target> :<message>
 class IRCdCommandInit : public IRCdCommand
 {
 	public:
@@ -53,7 +62,7 @@ class IRCdCommandInit : public IRCdCommand
 		}
 };
 
-// PASS
+// PASS <pass> TS 6 <sid>
 class IRCdCommandPass : public IRCdCommand
 {
 	public:
@@ -63,13 +72,12 @@ class IRCdCommandPass : public IRCdCommand
 		{
 			charybdis::ircd->linkSid = params.at(3);
 			// ok so we've recived the pass command. Let's take the id we get and store it
-			if (*(charybdis::ircd->linkSid.begin()) == ':')
-				charybdis::ircd->linkSid.erase(charybdis::ircd->linkSid.begin());
+			utils::stripColon(charybdis::ircd->linkSid);
 			// no doubt there is a : at the start, remove that.
 		}
 };
 
-// 
+// SERVER <name> <hopcount> :<server gecos>
 class IRCdCommandServer : public IRCdCommand
 {
 	public:
@@ -87,7 +95,7 @@ class IRCdCommandServer : public IRCdCommand
 		}
 };
 
-// CAPAB
+// CAPAB :<capabilities>
 class IRCdCommandCapab : public IRCdCommand
 {
 	public:
@@ -101,6 +109,37 @@ class IRCdCommandCapab : public IRCdCommand
 			if (!std::binary_search(params.begin(), params.end(), "SERVICES"))
 				instance->finalize("(ircd_charybdis) Required capability SERVICES not found.");
 			// search CAPAB to see if they support SERVICES, if not bail!
+		}
+};
+
+// SVINFO 6 6 0 :<timestamp>
+class IRCdCommandSVINFO : public IRCdCommand
+{
+	public:
+		IRCdCommandSVINFO() : IRCdCommand("SVINFO") { }
+		
+		void execute(String&, String &paramStr, std::vector<String> &params)
+		{
+			instance->ircdProtocol->duringBurst = true;
+			// we recieve SVINFO upon bursts, this is how we know a burst is definately starting.
+		}
+};
+
+// :<source> EUID <nick> 0 <nickts> <umodes> <username> <visible hostname> <ip> <uid> <real hostname> <account name> :<gecos>
+class IRCdCommandEUID : public IRCdCommand
+{
+	public:
+		IRCdCommandEUID() : IRCdCommand("EUID") { }
+		
+		void execute(String&, String &paramStr, std::vector<String> &params)
+		{
+			String gecos = utils::getDataAfter(params, 10);
+			utils::stripColon(gecos);
+			// gecos probably has a :, let's remove it for our buddy userManager
+			
+			instance->userManager->handleConnect(params.at(0), params.at(4), params.at(5), params.at(8), params.at(6), params.at(9), params.at(2), params.at(7), params.at(3), gecos);
+			// we send user manager some information about the user we just recieved. like so;
+			// > nick, username, hostname, real hostname, ip address, account name, nickts, uid, umodes, gecos
 		}
 };
 
@@ -136,6 +175,7 @@ charybdisProtocol::charybdisProtocol(void* h)
 			|| !((sid[2] >= 'A' && sid[2] <= 'Z') || (sid[2] >= '0' && sid[2] <= '9'))
 	)
 		throw Exception("ircd_charybdis", "ServicesServer::numeric must be in the format [0-9][A-Z0-9][A-Z0-9].");
+	// throw an exception if the numeric isnt correct.
 	
 	// read our name
 	instance->configReader->getValue(name, "servicesserver", "name");
@@ -145,6 +185,8 @@ charybdisProtocol::charybdisProtocol(void* h)
 	addCommand(new IRCdCommandPass);
 	addCommand(new IRCdCommandServer);
 	addCommand(new IRCdCommandCapab);
+	addCommand(new IRCdCommandSVINFO);
+	addCommand(new IRCdCommandEUID);
 	addCommand(new IRCdCommandPing);
 }
 

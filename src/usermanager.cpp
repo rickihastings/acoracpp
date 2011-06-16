@@ -13,6 +13,7 @@
 //===================================================//
 
 #include "usermanager.h"
+#include <iostream>
 
 UserManager::UserManager()
 { }
@@ -20,3 +21,17 @@ UserManager::UserManager()
 UserManager::~UserManager()
 { }
 
+void UserManager::handleConnect(
+	String &nick,
+	String &user,
+	String &host,
+	String &realhost,
+	String &ip,
+	String &accountName,
+	String &nickTS,
+	String &uid,
+	String &modes,
+	String &gecos)
+{
+	
+}

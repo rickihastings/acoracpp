@@ -41,6 +41,10 @@ namespace utils
     template<typename T> void explode(const char* delim, T &str, std::vector<T> &tokens);
     // replace
     void replace(String &s, String f, String r);
+	// getDataAfter
+	template<typename T> String getDataAfter(const T &data, unsigned int where);
+	// stripColon
+	template<typename T> void stripColon(T &data);
 }
 
 /**
@@ -191,6 +195,40 @@ inline void utils::replace(String &s, String f, String r)
         else
             break;
     }
+}
+
+/**
+ utils::getDataAfter
+
+ get data after (String)
+*/
+template<typename T>
+String utils::getDataAfter(const T &data, unsigned int where)
+{
+    String returnVal = "";
+    unsigned int i;
+
+    for (i = where; i != data.size(); ++i)
+    {
+        if (i != where)
+            returnVal += ' ';
+
+        returnVal.append(data.at(i));
+    }
+
+    return returnVal;
+}
+
+/**
+ utils::stripColon
+
+ if colon is first letter strip it.
+*/
+template<typename T>
+void utils::stripColon(T &data)
+{
+	if (*(data.begin()) == ':')
+		data.erase(data.begin());
 }
 
 #endif // UTILS_H

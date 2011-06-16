@@ -19,9 +19,11 @@
 #include "utils.h"
 
 IRCdProtocol::IRCdProtocol(void* h, const String ver) :
-	handle		(h),
-	version		(ver),
-	requireNumeric	(false)
+	handle (h),
+	version (ver),
+	requireNumeric (false),
+	finishedBurst (false),
+	duringBurst (false)
 { }
 
 
@@ -65,8 +67,8 @@ void IRCdProtocol::processBuffer(String &buf, IRCdCommand* parent, String src)
 	
 	std::vector<String> params;
 	
-	if (*(paramStr.begin()) == ':')
-		paramStr.erase(paramStr.begin());
+	utils::stripColon(paramStr);
+	// strip the colon!
 		
 	utils::explode(" ", paramStr, params);
 	// take the : off params, split it via ' ', send it into the execute function

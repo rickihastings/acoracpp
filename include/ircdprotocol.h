@@ -27,7 +27,6 @@ namespace err
 		enum
 		{
 			none,
-			badCommand,
 			alreadyExists
 		};
 	}
@@ -49,6 +48,10 @@ public:
 
 	// ircd requires a numeric to be specified
 	bool requireNumeric;
+	
+	// some variables that tell the state of the link, ie during burst, finished burst. etc
+	bool finishedBurst;
+	bool duringBurst;
 
 	// commands that trigger events
 	std::map<String, IRCdCommand*> commands;
