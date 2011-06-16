@@ -30,7 +30,7 @@ public:
 	virtual ~IRCdCommand();
 
 	// execute the command
-	virtual void execute(String &src, String &params) = 0;
+	virtual void execute(String &src, String &paramStr, std::vector<String> &params) = 0;
 };
 
 #endif // IRCDCOMMAND_H

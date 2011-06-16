@@ -58,9 +58,10 @@ class Instance : public Extensible
 	// services keep running till this value is true
 	bool keepRunning;
 
+public:
+
 	// time
 	std::time_t now;
-public:
 
 	// last error
 	String error;

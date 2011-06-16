@@ -22,49 +22,85 @@
 #include "exception.h"
 
 #include <iostream>
+#include <algorithm>
+
 // IRCD COMMANDS
 
+// PING
+class IRCdCommandPing : public IRCdCommand
+{
+	public:
+		IRCdCommandPing() : IRCdCommand("PING") { }
+
+		void execute(String&, String &paramStr, std::vector<String> &params)
+		{
+			// :<sid> PONG :<reply>
+			instance->socketEngine->sendString(":" + charybdis::ircd->sid + " PONG :" + params.at(0));
+		}
+};
+
+// NOTICE (hacked)
 class IRCdCommandInit : public IRCdCommand
 {
 	public:
-	
-		IRCdCommandInit() : IRCdCommand("NOTICE")
-		{ }
+		IRCdCommandInit() : IRCdCommand("NOTICE") { }
 		
-		void execute(String&, String &params)
+		void execute(String&, String &paramStr, std::vector<String> &params)
 		{
-			if (params == "* :*** Found your hostname")
-				chary::ircd->sendBurst();
+			if (paramStr == "* :*** Found your hostname")
+				charybdis::ircd->initServer();
+			// this is stupid but we have to do it unfortauntely..
 		}
 };
 
+// PASS
 class IRCdCommandPass : public IRCdCommand
 {
 	public:
-	
-		IRCdCommandPass() : IRCdCommand("PASS")
-		{ }
-		
-		void execute(String&, String &params)
+		IRCdCommandPass() : IRCdCommand("PASS") { }
+
+		void execute(String&, String &paramStr, std::vector<String> &params)
 		{
-			StringParser p(params);
-			String param;
-			
-			while (p.GetToken(param, ' '))
-				std::cout << param.c_str();
+			charybdis::ircd->linkSid = params.at(3);
+			// ok so we've recived the pass command. Let's take the id we get and store it
+			if (*(charybdis::ircd->linkSid.begin()) == ':')
+				charybdis::ircd->linkSid.erase(charybdis::ircd->linkSid.begin());
+			// no doubt there is a : at the start, remove that.
 		}
 };
 
+// 
+class IRCdCommandServer : public IRCdCommand
+{
+	public:
+		IRCdCommandServer() : IRCdCommand("SERVER") { }
+
+		void execute(String&, String &paramStr, std::vector<String> &params)
+		{
+			charybdis::ircd->linkName = params.at(0);
+			// ok so we've recived the server command. Let's take the id we get and store it
+			
+			String time;
+			utils::toStr(time, instance->now);
+			// :<sid> SVINFO 6 6 0 <timestamp>
+			instance->socketEngine->sendString(":" + charybdis::ircd->sid + " SVINFO 6 6 0 " + time);
+		}
+};
+
+// CAPAB
 class IRCdCommandCapab : public IRCdCommand
 {
 	public:
-
-		IRCdCommandCapab() : IRCdCommand("CAPAB")
-		{ }
+		IRCdCommandCapab() : IRCdCommand("CAPAB") { }
 		
-		void execute(String&, String &params)
+		void execute(String&, String &paramStr, std::vector<String> &params)
 		{
-			return instance->ircdProtocol->processBuffer(params, this);
+			std::vector<String>::iterator it;
+			std::sort(params.begin(), params.end());
+			
+			if (!std::binary_search(params.begin(), params.end(), "SERVICES"))
+				instance->finalize("(ircd_charybdis) Required capability SERVICES not found.");
+			// search CAPAB to see if they support SERVICES, if not bail!
 		}
 };
 
@@ -80,11 +116,11 @@ charybdisServer::~charybdisServer()
 // PROTOCOL METHODS
 
 charybdisProtocol::charybdisProtocol(void* h)
-: IRCdProtocol(h, "$Id: ircd_charybdis.cpp 707 2009-01-31 21:52:15Z ankit $")
+: IRCdProtocol(h, "$Id: ircd_charybdis.cpp 707 2009-01-31 21:52:15Z ricki $")
 {
-	// we're using insp::ircd as a global variable so that
+	// we're using charybdis::ircd as a global variable so that
 	// all IRCdCommands can make use of it
-	chary::ircd = this;
+	charybdis::ircd = this;
 	// inspircd requires numeric to be specified
 	requireNumeric = true;
 
@@ -104,38 +140,30 @@ charybdisProtocol::charybdisProtocol(void* h)
 	// read our name
 	instance->configReader->getValue(name, "servicesserver", "name");
 
+	// add commands.
 	addCommand(new IRCdCommandInit);
 	addCommand(new IRCdCommandPass);
+	addCommand(new IRCdCommandServer);
 	addCommand(new IRCdCommandCapab);
+	addCommand(new IRCdCommandPing);
 }
 
 
 charybdisProtocol::~charybdisProtocol()
 { }
 
-
-void charybdisProtocol::sendVersion()
+void charybdisProtocol::duringBurst()
 {
-	// :<sid> VERSION :<arbitrary version string>
-	//instance->socketEngine->sendString(":" + sid + " VERSION :acora-" + config::VERSION + " (" + sid + ") " + name);
+	// TODO INTRODUCE CLIENTS
+	
 }
 
-
-void charybdisProtocol::sendBurst()
+void charybdisProtocol::initServer()
 {
 	// PASS <password> TS 6 :<sid>
 	instance->socketEngine->sendString("PASS " + instance->configReader->getValue<String>("remoteserver", "password", String()) + " TS 6 :" + sid);
+	// CAPAB :<supported capab>
+	instance->socketEngine->sendString("CAPAB :QS EX CHW IE KLN KNOCK TB UNKLN CLUSTER ENCAP SERVICES RSFNC SAVE EUID EOPMOD BAN MLOCK");
 	// SERVER <servername> <hopcount> :<description>
 	instance->socketEngine->sendString("SERVER " + instance->configReader->getValue<String>("servicesserver", "name", String()) + " 0 :" + instance->configReader->getValue<String>("servicesserver", "desc", String()));
-
-	// :sid BURST {timestamp}
-	//instance->socketEngine->sendString(":" + sid + " BURST " + utils::toString<time_t>(instance->time()));
-	// send version
-	//sendVersion();
-
-	// XXX introduce clients
-
-	// :sid ENDBURST
-	//instance->socketEngine->sendString(":" + sid + " ENDBURST");
 }
-

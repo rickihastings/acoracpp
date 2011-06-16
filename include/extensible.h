@@ -19,6 +19,7 @@
 #include "nstring.h"
 
 #include <map>
+#include <vector>
 #include <deque>
 
 namespace extensible

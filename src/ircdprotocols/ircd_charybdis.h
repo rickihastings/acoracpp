@@ -39,20 +39,22 @@ public:
 	String sid;
 	// our server name
 	String name;
+	
+	String linkSid;
+	// their server id
+	String linkName;
+	// their server name
 
 	// constructor
 	charybdisProtocol(void* h);
 	// destructor
 	~charybdisProtocol();
 
-	// send version string
-	void sendVersion();
-	// send burst
-	void sendBurst();
-
+	void duringBurst();
+	void initServer();
 };
 
-namespace chary
+namespace charybdis
 {
 	charybdisProtocol* ircd; // use ircd to refer to instance's InspIRCdProtocol class
 }

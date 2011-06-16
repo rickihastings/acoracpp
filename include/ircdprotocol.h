@@ -27,6 +27,7 @@ namespace err
 		enum
 		{
 			none,
+			badCommand,
 			alreadyExists
 		};
 	}

@@ -102,7 +102,6 @@ void StringParser::Reset(String s)
 	pos = buf.begin();
 }
 
-
 void StringParser::GetString(String &s)
 {
 	s = buf;

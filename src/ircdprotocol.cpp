@@ -16,7 +16,7 @@
 #include "ircdcommand.h"
 #include "instance.h"
 #include "stringparser.h"
-
+#include "utils.h"
 
 IRCdProtocol::IRCdProtocol(void* h, const String ver) :
 	handle		(h),
@@ -32,7 +32,7 @@ IRCdProtocol::~IRCdProtocol()
 void IRCdProtocol::processBuffer(String &buf, IRCdCommand* parent, String src)
 {
 	bool getsrc = false;
-	String cmd, params;
+	String cmd, paramStr;
 	
 	if (!parent)
 	{
@@ -60,12 +60,18 @@ void IRCdProtocol::processBuffer(String &buf, IRCdCommand* parent, String src)
 		return;
 	}
 	else	
-		p.GetRemaining(params);
+		p.GetRemaining(paramStr);
+	// find out if we have a matching command, if not bail
 	
-	if (*(params.begin()) == ':')
-		params.erase(params.begin());
+	std::vector<String> params;
 	
-	i->second->execute(src, params);
+	if (*(paramStr.begin()) == ':')
+		paramStr.erase(paramStr.begin());
+		
+	utils::explode(" ", paramStr, params);
+	// take the : off params, split it via ' ', send it into the execute function
+	
+	i->second->execute(src, paramStr, params);
 }
 
 

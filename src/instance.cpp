@@ -26,7 +26,7 @@
 #include <cerrno>
 #include <cstring>
 #include <csignal>
-
+#include <vector>
 
 // functions used by run() for banner
 namespace banner
@@ -168,10 +168,11 @@ ErrorCode Instance::start()
 			banner::text("  - " + *i);
 	}
 	
-	banner::text("Services successfully started! (pid " + utils::toString<pid_t>(getpid()) + ")");
-	
 	if (!enableDebug && isatty(0) && isatty(1) && isatty(2) && kill(getppid(), SIGTERM) == -1)
+	{
 		banner::text(String() + "Error killing parent process: " + std::strerror(errno));
+		banner::end();
+	}
 
 	if (!enableDebug)
 	{
@@ -181,8 +182,6 @@ ErrorCode Instance::start()
 				close(i);
 		}
 	}
-	
-	banner::end();
 	
 	// initialize user and channel managers
 	userManager = new UserManager;

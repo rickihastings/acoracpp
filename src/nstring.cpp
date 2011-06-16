@@ -56,4 +56,3 @@ int nstring::char_traits::compare(const char* str1, const char* str2, size_t n)
 
 	return 0;
 }
-
