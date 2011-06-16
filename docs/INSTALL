@@ -1,0 +1,42 @@
+ACORA IRC SERVICES
+
+
+How To Install Nevitus
+----------------------
+
+In the root directory, type the following:
+
+./configure
+make
+make install
+
+* You might have to use gmake instead of make on some systems.
+
+Once done, make sure you edit your conf/acora.conf file.
+To start the services, type './acora start' in the root directory.
+
+
+How To Install Modules
+----------------------
+
+To install a third party module, copy the module to src/modules.
+Copy the module's language files to languages/<module_name>.
+For example, if the module is named m_foobar, create a directory
+called languages/m_foobar by typing this in the root directory:
+
+mkdir languages/m_foobar
+
+Then copy the language files in the directory just created.
+
+To compile, you could just follow the same steps as for compiling
+the services themselves, but if you'd like to compile and install
+ONLY the modules, do the following.
+
+In the root directory, type:
+
+make modules
+make modinstall
+
+* You have to run ./configure first if you haven't yet already.
+* You might have to use gmake instead of make on some systems.
+

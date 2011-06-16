@@ -1,0 +1,51 @@
+//===================================================//
+//                                                   //
+//              ~ Acora IRC Services ~               //
+//                                                   //
+//       Acora (C) 2011 Acora Development Team       //
+// Please see the file CREDITS for more information. //
+//                                                   //
+//   This program is free but copyrighted software   //
+//      Please see the file COPYING for details.     //
+//                                                   //
+//===================================================//
+// $Id: en_us.lang 618 2008-12-28 18:01:12Z ankit $
+//===================================================//
+//          ** US English Language File **          //
+//=================================================//
+
+//----------------------------------------------------------------------------+
+//                                PLEASE NOTE                                 |
+//----------------------------------------------------------------------------+
+//      o       C style (/* */), C++ style (//) and shell style (#) comments  |
+//              are allowed.                                                  |
+//      o       The following escape sequences are supported:                 |
+//              o       \\              The character \                       |
+//              o       \(              The character (                       |
+//              o       \)              The character )                       |
+//              o       \$              The character $                       |
+//              o       \b              Bold                                  |
+//              o       \u              Underline                             |
+//              o       \k              Color                                 |
+//              o       \n              New line                              |
+//              o       \<space>        Space in the beginning of string      |
+//----------------------------------------------------------------------------+
+
+
+unknown-command
+(
+	// Unknown command is entered
+	//	$1	the command entered
+	
+	The command '\b$1\b' is unknown.
+)
+
+
+for-help
+(
+	// Offer help	
+	//	$1	the string the user has to type for help
+	
+	For help, please type: \b$1\b
+)
+
