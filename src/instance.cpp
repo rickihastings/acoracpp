@@ -182,6 +182,8 @@ ErrorCode Instance::start()
 		}
 	}
 	
+	banner::end();
+	
 	// initialize user and channel managers
 	userManager = new UserManager;
 	channelManager = new ChannelManager;
