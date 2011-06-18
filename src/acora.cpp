@@ -38,7 +38,7 @@ namespace entry
 int main(int argc, char **argv)
 {
 	bool start = false, enableDebug = false;
-	String arg;
+	nstring::str arg;
 	
 	for (short i = 1; i < argc; ++i)
 	{
@@ -121,18 +121,18 @@ int main(int argc, char **argv)
 	// catch an exception
 	catch (Exception &e)
 	{
-		instance->debug(String() + "Exception thrown from " + e.getSource() + ": " + e.getReason());
+		instance->log(ERROR, "main(): " + nstring::str() + "Exception thrown from " + e.getSource() + ": " + e.getReason());
 		ret = err::exit::exception;
 	}
 	
 	// catch a standard exception
 	catch (std::exception &e)
 	{
-		instance->debug(String() + "Standard exception: " + e.what());
+		instance->log(ERROR, "main(): " + nstring::str() + "Standard exception: " + e.what());
 		ret = err::exit::exception;
 	}
 	
-	instance->debug("Exit code: " + utils::toString<ErrorCode>(ret));
+	instance->log(ERROR, "main(): Exit code: " + utils::toStr<ErrorCode>(ret));
 	
 	// finito
 	delete instance;

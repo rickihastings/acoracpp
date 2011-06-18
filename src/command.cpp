@@ -14,7 +14,7 @@
 
 #include "command.h"
 
-Command::Command(const String cmd) : name(cmd)
+Command::Command(const nstring::str cmd) : name(cmd)
 { }
 
 Command::~Command()

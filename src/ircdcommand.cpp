@@ -14,7 +14,7 @@
 
 #include "ircdcommand.h"
 
-IRCdCommand::IRCdCommand(const String cmd) : name(cmd)
+IRCdCommand::IRCdCommand(const nstring::str cmd) : name(cmd)
 { }
 
 IRCdCommand::~IRCdCommand()

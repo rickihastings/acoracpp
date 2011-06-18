@@ -37,9 +37,9 @@ namespace reader
 	}
 	
 	// append error to errors deque
-	void addError(const String &file, std::deque<String> &errors, int &lno, const String error)
+	void addError(const nstring::str &file, std::deque<nstring::str> &errors, int &lno, const nstring::str error)
 	{
-		errors.push_back(file + ":" + utils::toString<int>(lno) + ": " + error);
+		errors.push_back(file + ":" + utils::toStr<int>(lno) + ": " + error);
 	}
 }
 
@@ -52,18 +52,18 @@ ConfigReader::~ConfigReader()
 { }
 
 
-ErrorCode ConfigReader::read(const String &file, std::deque<String> &errors, std::deque<String> &filestack, std::map<std::string, std::map<std::string, std::deque<String> > > &vals)
+ErrorCode ConfigReader::read(const nstring::str &file, std::deque<nstring::str> &errors, std::deque<nstring::str> &filestack, std::map<std::string, std::map<std::string, std::deque<nstring::str> > > &vals)
 {
-	for (std::deque<String>::iterator i = filestack.begin(); i != filestack.end(); ++i)
+	for (std::deque<nstring::str>::iterator i = filestack.begin(); i != filestack.end(); ++i)
 	{
 		if (*i == file)
 			return err::configreader::loop;
 	}
 	
 	filestack.push_back(file);
-	instance->debug("Reading config file \"" + file + "\" ...");
+	instance->log(INFO, "ConfigReader(): Reading config file \"" + file + "\" ...");
 	
-	std::ifstream fin((String(config::CONFDIR) + file).c_str());
+	std::ifstream fin((nstring::str(config::CONFDIR) + file).c_str());
 	if (!fin)
 		return err::configreader::notFound;
 	
@@ -77,7 +77,7 @@ ErrorCode ConfigReader::read(const String &file, std::deque<String> &errors, std
 		
 		int lno = 0;
 		std::string line, block, key;
-		String value;
+		nstring::str value;
 		
 		short pos = reader::pos::global;
 		bool commented = false;
@@ -177,7 +177,7 @@ ErrorCode ConfigReader::read(const String &file, std::deque<String> &errors, std
 						block += charmaps::lower[static_cast<short>(*i)];
 					else if (glock && *i != ' ' && *i != '(')
 					{
-						reader::addError(file, errors, lno, String() + "Missing block after \"" + block.c_str() + "\"");
+						reader::addError(file, errors, lno, nstring::str() + "Missing block after \"" + block.c_str() + "\"");
 						return err::configreader::errors;
 					}
 					else
@@ -215,7 +215,7 @@ ErrorCode ConfigReader::read(const String &file, std::deque<String> &errors, std
 						}
 						else
 						{
-							reader::addError(file, errors, lno, String() + "Unexpected end of block (Missing value after key \"" + key.c_str() + "\")");
+							reader::addError(file, errors, lno, nstring::str() + "Unexpected end of block (Missing value after key \"" + key.c_str() + "\")");
 							return err::configreader::errors;
 						}
 					}
@@ -229,7 +229,7 @@ ErrorCode ConfigReader::read(const String &file, std::deque<String> &errors, std
 						key += charmaps::lower[static_cast<short>(*i)];
 					else if (klock && *i != ' ' && *i != '"')
 					{
-						reader::addError(file, errors, lno, String() + "Missing value after key \"" + key.c_str() + "\"");
+						reader::addError(file, errors, lno, nstring::str() + "Missing value after key \"" + key.c_str() + "\"");
 						return err::configreader::errors;
 					}
 					else
@@ -309,13 +309,13 @@ ErrorCode ConfigReader::read(const String &file, std::deque<String> &errors, std
 		
 		if (!block.empty())
 		{
-			reader::addError(file, errors, lno, String() + "Unexpected end of file (Block \"" + block.c_str() + "\" is left open)");
+			reader::addError(file, errors, lno, nstring::str() + "Unexpected end of file (Block \"" + block.c_str() + "\" is left open)");
 			return err::configreader::errors;
 		}
 	}
 	
 	filestack.pop_back();
-	instance->debug("Finished reading config file \"" + file + "\".");
+	instance->log(INFO, "ConfigReader(): Finished reading config file \"" + file + "\".");
 	
 	if (errors.empty())
 		return err::configreader::none;
@@ -324,10 +324,10 @@ ErrorCode ConfigReader::read(const String &file, std::deque<String> &errors, std
 }
 
 
-ErrorCode ConfigReader::read(const String file, std::deque<String> &errors)
+ErrorCode ConfigReader::read(const nstring::str file, std::deque<nstring::str> &errors)
 {
-	std::deque<String> filestack;
-	std::map<std::string, std::map<std::string, std::deque<String> > > vals;
+	std::deque<nstring::str> filestack;
+	std::map<std::string, std::map<std::string, std::deque<nstring::str> > > vals;
 
 	ErrorCode ret = read(file, errors, filestack, vals);
 	
@@ -367,16 +367,16 @@ ErrorCode ConfigReader::read(const String file, std::deque<String> &errors)
 }
 
 
-bool ConfigReader::isEmpty(const std::string block, const std::string key, std::map<std::string, std::map<std::string, std::deque<String> > >* vals)
+bool ConfigReader::isEmpty(const std::string block, const std::string key, std::map<std::string, std::map<std::string, std::deque<nstring::str> > >* vals)
 {
 	if (!vals)
 		vals = &values;
 
-	std::map<std::string, std::map<std::string, std::deque<String> > >::iterator i = vals->find(block);
+	std::map<std::string, std::map<std::string, std::deque<nstring::str> > >::iterator i = vals->find(block);
 	
 	if (i != vals->end())
 	{
-		std::map<std::string, std::deque<String> >::iterator j = i->second.find(key);
+		std::map<std::string, std::deque<nstring::str> >::iterator j = i->second.find(key);
 		
 		if (j != i->second.end())
 			return false;
@@ -386,16 +386,16 @@ bool ConfigReader::isEmpty(const std::string block, const std::string key, std::
 }
 
 
-void ConfigReader::getValue(String &in, const std::string block, const std::string key, String def, std::map<std::string, std::map<std::string, std::deque<String> > >* vals)
+void ConfigReader::getValue(nstring::str &in, const std::string block, const std::string key, nstring::str def, std::map<std::string, std::map<std::string, std::deque<nstring::str> > >* vals)
 {
 	if (!vals)
 		vals = &values;
 	
-	std::map<std::string, std::map<std::string, std::deque<String> > >::iterator i = vals->find(block);
+	std::map<std::string, std::map<std::string, std::deque<nstring::str> > >::iterator i = vals->find(block);
 	
 	if (i != vals->end())
 	{
-		std::map<std::string, std::deque<String> >::iterator j = i->second.find(key);
+		std::map<std::string, std::deque<nstring::str> >::iterator j = i->second.find(key);
 		
 		if (j != i->second.end())
 		{
@@ -408,16 +408,16 @@ void ConfigReader::getValue(String &in, const std::string block, const std::stri
 }
 
 
-void ConfigReader::getValue(int &in, const std::string block, const std::string key, int def, std::map<std::string, std::map<std::string, std::deque<String> > >* vals)
+void ConfigReader::getValue(int &in, const std::string block, const std::string key, int def, std::map<std::string, std::map<std::string, std::deque<nstring::str> > >* vals)
 {
 	if (!vals)
 		vals = &values;
 
-	std::map<std::string, std::map<std::string, std::deque<String> > >::iterator i = vals->find(block);
+	std::map<std::string, std::map<std::string, std::deque<nstring::str> > >::iterator i = vals->find(block);
 	
 	if (i != vals->end())
 	{
-		std::map<std::string, std::deque<String> >::iterator j = i->second.find(key);
+		std::map<std::string, std::deque<nstring::str> >::iterator j = i->second.find(key);
 		
 		if (j != i->second.end())
 		{
@@ -430,16 +430,16 @@ void ConfigReader::getValue(int &in, const std::string block, const std::string 
 }
 
 
-void ConfigReader::getValue(bool &in, const std::string block, const std::string key, bool def, std::map<std::string, std::map<std::string, std::deque<String> > >* vals)
+void ConfigReader::getValue(bool &in, const std::string block, const std::string key, bool def, std::map<std::string, std::map<std::string, std::deque<nstring::str> > >* vals)
 {
 	if (!vals)
 		vals = &values;
 		
-	std::map<std::string, std::map<std::string, std::deque<String> > >::iterator i = vals->find(block);
+	std::map<std::string, std::map<std::string, std::deque<nstring::str> > >::iterator i = vals->find(block);
 	
 	if (i != vals->end())
 	{
-		std::map<std::string, std::deque<String> >::iterator j = i->second.find(key);
+		std::map<std::string, std::deque<nstring::str> >::iterator j = i->second.find(key);
 		
 		if (j != i->second.end())
 		{
@@ -458,16 +458,16 @@ void ConfigReader::getValue(bool &in, const std::string block, const std::string
 }
 
 
-void ConfigReader::getValues(std::deque<String> &in, const std::string block, const std::string key, std::map<std::string, std::map<std::string, std::deque<String> > >* vals)
+void ConfigReader::getValues(std::deque<nstring::str> &in, const std::string block, const std::string key, std::map<std::string, std::map<std::string, std::deque<nstring::str> > >* vals)
 {
 	if (!vals)
 		vals = &values;
 	
-	std::map<std::string, std::map<std::string, std::deque<String> > >::iterator i = vals->find(block);
+	std::map<std::string, std::map<std::string, std::deque<nstring::str> > >::iterator i = vals->find(block);
 	
 	if (i != vals->end())
 	{
-		std::map<std::string, std::deque<String> >::iterator j = i->second.find(key);
+		std::map<std::string, std::deque<nstring::str> >::iterator j = i->second.find(key);
 		
 		if (j != i->second.end())
 			in = j->second;

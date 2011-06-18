@@ -15,7 +15,7 @@
 #ifndef	MODULEMANAGER_H
 #define	MODULEMANAGER_H
 
-#include "extensible.h"
+#include "base.h"
 
 #include <map>
 #include <deque>
@@ -43,7 +43,7 @@ namespace err
 class Module;
 
 // manages all kinds of modules
-class ModuleManager : public Extensible
+class ModuleManager
 {
 protected:
 	// get module object
@@ -68,28 +68,28 @@ public:
 	virtual ~ModuleManager();
 
 	// load the socket engine
-	virtual ErrorCode loadSocketEngine(String);
+	virtual ErrorCode loadSocketEngine(nstring::str);
 	// load the ircd protocol
-	virtual ErrorCode loadIRCdProtocol(String);
+	virtual ErrorCode loadIRCdProtocol(nstring::str);
 
 	// load the disk manager
-	virtual ErrorCode loadDiskManager(String&, bool = false);
+	virtual ErrorCode loadDiskManager(nstring::str&, bool = false);
 	// unload the disk manager
 	virtual ErrorCode unloadDiskManager();
 
 	// load a module
-	virtual ErrorCode loadModule(String&);
+	virtual ErrorCode loadModule(nstring::str&);
 	// unload a module
 	virtual ErrorCode unloadModule(std::map<std::string, Module*>::iterator&, bool = false);
 	// reload a module
 	virtual ErrorCode reloadModule(std::map<std::string, Module*>::iterator&, bool = false);
 
 	// return a Module*
-	virtual Module* getModule(String);
+	virtual Module* getModule(nstring::str);
 
 	// load autoload modules specified in the
 	// config file
-	virtual void loadAutoloadModules(std::deque<String> &list);
+	virtual void loadAutoloadModules(std::deque<nstring::str> &list);
 };
 
 #endif // MODULEMANAGER_H

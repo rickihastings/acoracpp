@@ -15,10 +15,10 @@
 #ifndef SERVER_H
 #define SERVER_H
 
-#include "extensible.h"
+#include "base.h"
 
 // a server on the network
-class Server : public Extensible
+class Server
 {
 public:
 	// constructor

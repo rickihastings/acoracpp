@@ -15,7 +15,7 @@
 #ifndef	MODULE_H
 #define	MODULE_H
 
-#include "extensible.h"
+#include "base.h"
 
 #include <bitset>
 
@@ -32,21 +32,21 @@ namespace flags
 }
 
 // base class for modules
-class Module : public Extensible
+class Module
 {
 public:
 	// module handle
 	const void* handle;
 
 	// module version
-	const String version;
+	const nstring::str version;
 	// module type
-	const String type;
+	const nstring::str type;
 	// module flags
 	const std::bitset<1> flags;
 
 	// constructor
-	Module(void* handle, const String version, const String type, unsigned long flags = 0);
+	Module(void* handle, const nstring::str version, const nstring::str type, unsigned long flags = 0);
 	// destructor
 	virtual ~Module();
 };

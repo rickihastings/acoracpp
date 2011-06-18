@@ -9,8 +9,6 @@
 //      Please see the file COPYING for details.     //
 //                                                   //
 //===================================================//
-// $Id: ircdprotocol.cpp 698 2009-01-29 16:33:02Z ankit $
-//===================================================//
 
 #include "ircdprotocol.h"
 #include "ircdcommand.h"
@@ -18,23 +16,29 @@
 #include "stringparser.h"
 #include "utils.h"
 
-IRCdProtocol::IRCdProtocol(void* h, const String ver) :
-	handle (h),
-	version (ver),
-	requireNumeric (false),
-	finishedBurst (false),
-	duringBurst (false)
-{ }
+#include <iostream>
 
+IRCdProtocol::IRCdProtocol(void* h, const nstring::str ver) :
+	handle(h),
+	version(ver),
+	requireNumeric(false),
+	finishedBurst(false),
+	duringBurst(false)
+{ }
 
 IRCdProtocol::~IRCdProtocol()
-{ }
+{
+	std::map<nstring::str, IRCdCommand*>::iterator i;
+	
+	for (i = commands.begin(); i != commands.end(); ++i)
+		delete i->second;
+	commands.clear();
+}
 
-
-void IRCdProtocol::processBuffer(String &buf, IRCdCommand* parent, String src)
+void IRCdProtocol::processBuffer(nstring::str &buf, IRCdCommand* parent, nstring::str src)
 {
 	bool getsrc = false;
-	String cmd, paramStr;
+	nstring::str cmd, paramStr;
 	
 	if (!parent)
 	{
@@ -54,18 +58,18 @@ void IRCdProtocol::processBuffer(String &buf, IRCdCommand* parent, String src)
 	if (parent)
 		cmd = parent->name + " " + cmd;
 	
-	std::map<String, IRCdCommand*>::iterator i = commands.find(cmd);
+	std::map<nstring::str, IRCdCommand*>::iterator i = commands.find(cmd);
 	
 	if (i == commands.end())
 	{
-		instance->debug("Command " + cmd + " not found");
+		instance->log(ERROR, "IRCdProtocol(): Command " + cmd + " not found, not critical.");
 		return;
 	}
-	else	
+	else
 		p.GetRemaining(paramStr);
 	// find out if we have a matching command, if not bail
 	
-	std::vector<String> params;
+	std::vector<nstring::str> params;
 	
 	utils::stripColon(paramStr);
 	// strip the colon!

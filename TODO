@@ -1,0 +1,8 @@
+// TODO LIST
+
+* Create a proper method to log data, the earlier we do this the less code we have to edit later on. A function that logs data into the chan
+  into the logfile, and into the debug window. (DONE-ISH)
+* handleConnect() in userManager, should be creating user classes and sending data into there. while storing pointers to the class (DONE)
+* getUserFromId() in userManager, should return a pointer to the user from UID 
+* getUser() in userManager, native method to return a pointer from nick.
+* parse QUIT in S2S and remove the user class in userManager accordingly.

@@ -39,7 +39,7 @@ namespace banner
 	}
 	
 	// display text after banner
-	void text(String s)
+	void text(nstring::str s)
 	{
 		std::cout << "- " << s.c_str() << std::endl;
 	}
@@ -52,18 +52,18 @@ namespace banner
 
 
 Instance::Instance(int &ac, char **av, const bool &d) :
-	argc		(ac),
-	argv		(av),
-	enableDebug	(d),
-	keepRunning	(true),
-	now		(std::time(NULL)),
-	moduleManager	(NULL),
-	socketEngine	(NULL),
-	ircdProtocol	(NULL),
-	diskManager	(NULL),
-	configReader	(NULL),
-	userManager	(NULL),
-	channelManager	(NULL)
+	argc(ac),
+	argv(av),
+	enableDebug(d),
+	keepRunning(true),
+	now(std::time(NULL)),
+	moduleManager(NULL),
+	socketEngine(NULL),
+	ircdProtocol(NULL),
+	diskManager(NULL),
+	configReader(NULL),
+	userManager(NULL),
+	channelManager(NULL)
 { }
 
 
@@ -71,7 +71,7 @@ Instance::Instance(int &ac, char **av, const bool &d) :
 
 void Instance::cleanup()
 {
-	debug("Cleaning up ...");
+	log(INFO, "Instance(): Cleaning up ...");
 
 	// deleting moduleManager deletes socketEngine, ircdProtocol,
 	// diskManager and loaded modules
@@ -80,7 +80,7 @@ void Instance::cleanup()
 	if (userManager)	DELETE(userManager);
 	if (channelManager)	DELETE(channelManager);
 	
-	debug("Cleanup complete.");
+	log(INFO, "Instance(): Cleanup complete.");
 }
 
 #undef DELETE
@@ -89,7 +89,7 @@ void Instance::cleanup()
 Instance::~Instance()
 {
 	cleanup();
-	debug("Shutting down ...");
+	log(INFO, "Instance(): Shutting down ...");
 }
 
 
@@ -100,7 +100,7 @@ ErrorCode Instance::start()
 	// read config file
 	configReader = new ConfigReader;
 	
-	std::deque<String> errors;
+	std::deque<nstring::str> errors;
 	ErrorCode r = configReader->read("acora.conf", errors);
 	
 	if (r == err::configreader::notFound)
@@ -116,7 +116,7 @@ ErrorCode Instance::start()
 		else
 			banner::text("There were warnings in your config file:");
 		
-		for (std::deque<String>::iterator i = errors.begin(); i != errors.end(); ++i)
+		for (std::deque<nstring::str>::iterator i = errors.begin(); i != errors.end(); ++i)
 			banner::text("  - " + *i);
 		
 		if (r == err::configreader::errors)
@@ -126,11 +126,41 @@ ErrorCode Instance::start()
 		}
 	}
 	
+	// set our log level (std::vector<int>) (believe it or not)
+    /*nstring::str loglevel = "info error network rawdata logchan";
+    std::vector<nstring::str> loglevels;
+	
+	utils::explode(" ", loglevel, loglevels);
+    for (std::vector<nstring::str>::iterator i = loglevels.begin(); i != loglevels.end(); ++i)
+    {
+        if (*i == "all")
+            logLevel[ALL] = *i;
+        if (*i == "info")
+            logLevel[INFO] = *i;
+        if (*i == "error")
+            logLevel[ERROR] = *i;
+        if (*i == "network")
+            logLevel[NETWORK] = *i;
+        if (*i == "commands")
+            logLevel[COMMANDS] = *i;
+        if (*i == "admin")
+            logLevel[ADMIN] = *i;
+        if (*i == "register")
+            logLevel[REGISTER] = *i;
+        if (*i == "rawdata")
+            logLevel[RAWDATA] = *i;
+        if (*i == "logchan")
+            logLevel[LOGCHAN] = *i;
+    }
+    iterators[ALL] = logLevel.find(ALL);
+    iterators[INFO] = logLevel.find(INFO);
+    iterators[RAWDATA]= logLevel.find(RAWDATA);*/
+	
 	// create module manager
 	moduleManager = new ModuleManager;
 
 	// load socketengine
-	String se;
+	nstring::str se;
 	configReader->getValue(se, "modules", "socketengine");
 	if (moduleManager->loadSocketEngine(se) != err::modulemanager::none)
 	{
@@ -140,7 +170,7 @@ ErrorCode Instance::start()
 	}
 
 	// load ircdprotocol
-	String ip;
+	nstring::str ip;
 	configReader->getValue(ip, "modules", "ircdprotocol");
 	if (moduleManager->loadIRCdProtocol(ip) != err::modulemanager::none)
 	{
@@ -164,13 +194,13 @@ ErrorCode Instance::start()
 	{
 		banner::text("The following modules could not be loaded:");
 		
-		for (std::deque<String>::iterator i = errors.begin(); i != errors.end(); ++i)
+		for (std::deque<nstring::str>::iterator i = errors.begin(); i != errors.end(); ++i)
 			banner::text("  - " + *i);
 	}
 	
 	if (!enableDebug && isatty(0) && isatty(1) && isatty(2) && kill(getppid(), SIGTERM) == -1)
 	{
-		banner::text(String() + "Error killing parent process: " + std::strerror(errno));
+		banner::text(nstring::str() + "Error killing parent process: " + std::strerror(errno));
 		banner::end();
 	}
 
@@ -193,7 +223,7 @@ ErrorCode Instance::start()
 
 ErrorCode Instance::run()
 {
-	String buffer;
+	nstring::str buffer;
 	ErrorCode ret;
 
 	while (keepRunning)
@@ -205,7 +235,7 @@ ErrorCode Instance::run()
 			ircdProtocol->processBuffer(buffer);
 		else if (ret != err::socketengine::empty)
 		{
-			debug("recv returned error: " + error);
+			log(NETWORK, "Instance(): recv returned error: " + error);
 			break;
 		}
 	}
@@ -213,6 +243,35 @@ ErrorCode Instance::run()
 	return err::exit::normal;
 }
 
+/**
+ Instance::debug
+
+ debug
+ */
+void Instance::log(int type, const nstring::str &text, ...)
+{
+    // variables
+    char formattedTime[9];
+    struct tm * timeInfo = localtime(&now);
+
+    // generate our time
+    strftime(formattedTime, sizeof(formattedTime), "%X", timeInfo);
+
+    char textBuffer[MAXBUF+1] = "";
+    va_list argsPtr;
+
+    va_start(argsPtr, text);
+    vsprintf(textBuffer, text.c_str(), argsPtr);
+
+    std::map<int, nstring::str>::iterator i = logLevel.find(type);
+
+    if (enableDebug)
+		std::cout << "[" << formattedTime << "] " << textBuffer << std::endl;
+	
+	// logchan etc.
+
+    va_end(argsPtr);
+}
 
 std::time_t Instance::time(time_t since)
 {
@@ -226,14 +285,7 @@ void Instance::exit(ErrorCode err)
 }
 
 
-void Instance::debug(String s)
-{
-	if (enableDebug)
-		std::cout << "[DBG] " << s.c_str() << std::endl;
-}
-
-
-void Instance::finalize(String s)
+void Instance::finalize(nstring::str s)
 {
 	error = s;
 	keepRunning = false;

@@ -14,7 +14,7 @@
 
 #include "module.h"
 
-Module::Module(void* h, const String ver, const String t, unsigned long f) :
+Module::Module(void* h, const nstring::str ver, const nstring::str t, unsigned long f) :
 	handle(h),
 	version(ver),
 	type(t),

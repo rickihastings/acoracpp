@@ -15,6 +15,14 @@
 #ifndef	BASE_H
 #define	BASE_H
 
+#include "nstring.h"
+
+#include <map>
+#include <vector>
+#include <ctime>
+#include <stdarg.h>
+#include <stdio.h>
+
 // the base class for all classes
 class Base
 {

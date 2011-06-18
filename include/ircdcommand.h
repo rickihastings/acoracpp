@@ -15,22 +15,22 @@
 #ifndef IRCDCOMMAND_H
 #define IRCDCOMMAND_H
 
-#include "extensible.h"
+#include "base.h"
 
 // base class for IRCd commands
-class IRCdCommand : public Extensible
+class IRCdCommand
 {
 public:
 	// command name
-	const String name;
+	const nstring::str name;
 
 	// constructor
-	IRCdCommand(const String);
+	IRCdCommand(const nstring::str);
 	// destructor
 	virtual ~IRCdCommand();
 
 	// execute the command
-	virtual void execute(String &src, String &paramStr, std::vector<String> &params) = 0;
+	virtual void execute(nstring::str &src, nstring::str &paramStr, std::vector<nstring::str> &params) = 0;
 };
 
 #endif // IRCDCOMMAND_H

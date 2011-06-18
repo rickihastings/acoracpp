@@ -14,7 +14,7 @@
 
 #include "exception.h"
 
-Exception::Exception(const String source, const String error) :
+Exception::Exception(const nstring::str source, const nstring::str error) :
 	src(source),
 	err(error)
 { }

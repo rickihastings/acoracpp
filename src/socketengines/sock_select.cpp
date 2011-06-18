@@ -40,7 +40,7 @@ class SelectEngine : public SocketEngine
 
 			if (rem == -1)
 			{
-				instance->error = String() + "send() error: " + std::strerror(errno);
+				instance->error = nstring::str() + "send() error: " + std::strerror(errno);
 				return err::socketengine::send;
 			}
 
@@ -78,11 +78,11 @@ public:
 	// connect to the remote server
 	ErrorCode connect()
 	{
-		instance->debug("Connecting ...");
+		instance->log(INFO, "SelectEngine(): Connecting to uplink...");
 		
 		if (isConnected())
 		{
-			instance->debug("Already connected.");
+			instance->log(INFO, "SelectEngine(): Already connected.");
 			return err::socketengine::alreadyConnected;
 		}
 
@@ -104,25 +104,25 @@ public:
 
 		if (!instance->configReader->isEmpty("localbind", "address"))
 		{
-			lhe = gethostbyname((instance->configReader->getValue<String>("localbind", "address", String())).c_str());
+			lhe = gethostbyname((instance->configReader->getValue<nstring::str>("localbind", "address", nstring::str())).c_str());
 			if (!lhe)
 			{
-				instance->error = String() + "Resolving local address: " + std::strerror(errno);
+				instance->error = nstring::str() + "Resolving local address: " + std::strerror(errno);
 				return err::socketengine::resolve;
 			}
 		}
 
-		he = gethostbyname((instance->configReader->getValue<String>("remoteserver", "address", String())).c_str());
+		he = gethostbyname((instance->configReader->getValue<nstring::str>("remoteserver", "address", nstring::str())).c_str());
 		if (!he)
 		{
-			instance->error = String() + "Resolving remote address: " + std::strerror(errno);
+			instance->error = nstring::str() + "Resolving remote address: " + std::strerror(errno);
 			return err::socketengine::resolve;
 		}
 
 		fd = socket(PF_INET, SOCK_STREAM, 0);
 		if (fd == -1)
 		{
-			instance->error = String() + "Creating socket: " + std::strerror(errno);
+			instance->error = nstring::str() + "Creating socket: " + std::strerror(errno);
 			return err::socketengine::socket;
 		}
 
@@ -145,7 +145,7 @@ public:
 
 			if (bind(fd, reinterpret_cast<sockaddr*>(&laddr), sizeof(laddr)) == -1)
 			{
-				instance->error = String() + "Binding to local address: " + std::strerror(errno);
+				instance->error = nstring::str() + "Binding to local address: " + std::strerror(errno);
 				return err::socketengine::local;
 			}
 		}
@@ -162,19 +162,19 @@ public:
 		FD_SET(fd, &eset);
 
 		connected = true;
-		instance->debug("Connected.");
+		instance->log(INFO, "SelectEngine(): Connected to uplink.");
 
 		return err::socketengine::none;
 	}
 	
 
 	// send data to remote server
-	ErrorCode send(String &buf)
+	ErrorCode send(nstring::str &buf)
 	{
 		if (buf.length() > 510)
 			buf.resize(510);
 
-		instance->debug("(SENT)  " + buf);
+		instance->log(RAWDATA, "<<  " + buf);
 		buf += "\r\n";
 		
 		return send(buf.c_str(), buf.length());
@@ -182,7 +182,7 @@ public:
 
 
 	// receive data from remote server
-	ErrorCode recv(String &ret)
+	ErrorCode recv(nstring::str &ret)
 	{
 		ret.clear();
 
@@ -193,7 +193,7 @@ public:
 		int rv = select(fd + 1, &st, NULL, &ex, NULL);
 		if (rv == -1)
 		{
-			instance->finalize(String() + "select() error: " + std::strerror(errno));
+			instance->finalize(nstring::str() + "select() error: " + std::strerror(errno));
 			return err::socketengine::engine;
 		}
 		else if (!rv)
@@ -215,7 +215,7 @@ public:
 				int r = ::recv(fd, buf, 1, 0);
 				if (r == -1)
 				{
-					instance->finalize(String() + "recv() error: " + std::strerror(errno));
+					instance->finalize(nstring::str() + "recv() error: " + std::strerror(errno));
 					return err::socketengine::recv;
 				}
 				else if (!r)
@@ -227,7 +227,7 @@ public:
 				if (ch == '\r' || ch == '\n')
 				{
 					ret.erase(ret.end() - 1);
-					instance->debug("(RECV)  " + ret);
+					instance->log(RAWDATA, ">>  " + ret);
 					return err::socketengine::none;
 				}
 
@@ -247,22 +247,22 @@ public:
 		if (!isConnected())
 			return err::socketengine::notConnected;
 		
-		instance->debug("Disconnecting ...");
+		instance->log(INFO, "SelectEngine(): Disconnecting ...");
 		
 		if (shutdown(fd, SHUT_RDWR) == -1)
 		{
-			instance->error = String() + "shutdown() error: " + std::strerror(errno);
+			instance->error = nstring::str() + "shutdown() error: " + std::strerror(errno);
 			return err::socketengine::shutdown;
 		}
 
 		if (close(fd) == -1)
 		{
-			instance->error = String() + "close() error: " + std::strerror(errno);
+			instance->error = nstring::str() + "close() error: " + std::strerror(errno);
 			return err::socketengine::close;
 		}
 
 		connected = false;
-		instance->debug("Disconnected.");
+		instance->log(INFO, "SelectEngine(): Disconnected.");
 		
 		return err::socketengine::none;
 	}

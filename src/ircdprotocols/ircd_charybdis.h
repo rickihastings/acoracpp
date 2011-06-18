@@ -16,6 +16,7 @@
 #include "ircdcommand.h"
 #include "server.h"
 
+#include <deque>
 
 // a charybdis server
 class charybdisServer : public Server
@@ -34,15 +35,15 @@ public:
 	// loaded modules
 	std::deque<std::string> modules;
 	// capabilities
-	std::map<std::string, String> capabs;
+	std::map<std::string, nstring::str> capabs;
 	// our SID
-	String sid;
+	nstring::str sid;
 	// our server name
-	String name;
+	nstring::str name;
 	
-	String linkSid;
+	nstring::str linkSid;
 	// their server id
-	String linkName;
+	nstring::str linkName;
 	// their server name
 
 	// constructor

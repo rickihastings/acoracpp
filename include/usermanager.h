@@ -15,19 +15,33 @@
 #ifndef	USERMANAGER_H
 #define	USERMANAGER_H
 
-#include "extensible.h"
+#include "base.h"
+#include "user.h"
 
 // manages users on the network
-class UserManager : public Extensible
+class UserManager
 {
+	// uid map
+	std::map<nstring::str, nstring::str&> uidMap;
+	// internal user map
+	std::map<nstring::str, User*> users;
+	
 public:
+
 	// constructor
 	UserManager();
 	// destructor
 	virtual ~UserManager();
 	
 	// handle connect
-	virtual void handleConnect(String&, String&, String&, String&, String&, String&, String&, String&, String&, String&);
+	void handleConnect(nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&);
+	// handle quit
+	void handleQuit(nstring::str&);
+	
+	// get nickname from id
+	void getNickFromId(nstring::str&, nstring::str&);
+	// get user
+	//nstring::str GetUser(nstring::str&);
 };
 
 #endif // USERMANAGER_H

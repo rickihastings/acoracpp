@@ -24,13 +24,13 @@ class Exception : public std::exception
 {
 protected:
 	// source of the error
-	const String src;
+	const nstring::str src;
 	// the error
-	const String err;
+	const nstring::str err;
 
 public:
 	// constructor
-	Exception(const String src, const String err);
+	Exception(const nstring::str src, const nstring::str err);
 	// destructor
 	virtual ~Exception() throw ();
 	

@@ -14,7 +14,7 @@
 
 #include "diskmanager.h"
 
-DiskManager::DiskManager(void* h, const String ver) :
+DiskManager::DiskManager(void* h, const nstring::str ver) :
 	handle(h),
 	version(ver)
 { }

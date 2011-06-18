@@ -15,10 +15,10 @@
 #ifndef	CHANNELMANAGER_H
 #define	CHANNELMANAGER_H
 
-#include "extensible.h"
+#include "base.h"
 
 // manages channels on the network
-class ChannelManager : public Extensible
+class ChannelManager
 {
 public:
 	// constructor

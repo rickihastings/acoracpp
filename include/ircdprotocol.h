@@ -15,7 +15,7 @@
 #ifndef	IRCDPROTOCOL_H
 #define	IRCDPROTOCOL_H
 
-#include "extensible.h"
+#include "base.h"
 
 #include <map>
 
@@ -44,7 +44,7 @@ public:
 	// module handle
 	const void* handle;
 	// module version
-	const String version;
+	const nstring::str version;
 
 	// ircd requires a numeric to be specified
 	bool requireNumeric;
@@ -54,17 +54,17 @@ public:
 	bool duringBurst;
 
 	// commands that trigger events
-	std::map<String, IRCdCommand*> commands;
+	std::map<nstring::str, IRCdCommand*> commands;
 	// servers
-	std::map<String, Server*> servers;
+	std::map<nstring::str, Server*> servers;
 
 	// constructor
-	IRCdProtocol(void*, const String version);
+	IRCdProtocol(void*, const nstring::str version);
 	// destructor
 	virtual ~IRCdProtocol();
 
 	// process buffer
-	virtual void processBuffer(String&, IRCdCommand* parent = NULL, String src = String());
+	virtual void processBuffer(nstring::str&, IRCdCommand* parent = NULL, nstring::str src = nstring::str());
 	// add a command
 	virtual ErrorCode addCommand(IRCdCommand*);
 };

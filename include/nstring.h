@@ -19,7 +19,7 @@
 
 namespace nstring
 {
-	// our char_traits for String, allows case insensitive comparisions of strings
+	// our char_traits for nstring::str, allows case insensitive comparisions of strings
 	struct char_traits : public std::char_traits<char>
 	{
 		// true if two char's are equal
@@ -31,10 +31,10 @@ namespace nstring
 		// compare two strings
 		static int compare(const char*, const char*, size_t);
 	};
+	
+	// implements acora_char_traits
+	typedef std::basic_string<char, nstring::char_traits, std::allocator<char> > str;
 } // namespace nstring
-
-// implements acora_char_traits
-typedef std::basic_string<char, nstring::char_traits, std::allocator<char> > String;
 
 #endif // NSTRING_H
 

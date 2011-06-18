@@ -15,9 +15,26 @@
 #ifndef	INSTANCE_H
 #define	INSTANCE_H
 
-#include "extensible.h"
+#include "base.h"
 
-#include <ctime>
+/**
+ debug variables
+ */
+#define ALL 0
+#define INFO 1
+
+#define ERROR 2
+#define NETWORK 3
+#define COMMANDS 4
+#define ADMIN 5
+#define REGISTER 6
+#define RAWDATA 7
+#define LOGCHAN 8
+
+/**
+ max buffer - irc data
+ */
+#define MAXBUF 512
 
 // exit codes
 namespace err
@@ -47,7 +64,7 @@ class IRCdProtocol;
 class DiskManager;
 
 // an instance of the services
-class Instance : public Extensible
+class Instance
 {
 	// arguments
 	int argc;
@@ -57,6 +74,10 @@ class Instance : public Extensible
 	const bool enableDebug;
 	// services keep running till this value is true
 	bool keepRunning;
+	// loglevel
+	std::map<int, nstring::str> logLevel;
+	// log level iterators
+	std::map<int, std::map<int, nstring::str>::iterator> iterators;
 
 public:
 
@@ -64,7 +85,7 @@ public:
 	std::time_t now;
 
 	// last error
-	String error;
+	nstring::str error;
 
 	// module manager
 	ModuleManager* moduleManager;
@@ -91,14 +112,15 @@ public:
 
 	// get time
 	std::time_t time(time_t since = 0);
-	// debug message
-	void debug(const String);
 
 	// start the services
 	ErrorCode start();
 	// run the iterations
 	ErrorCode run();
-
+	
+	// log
+	void log(int type, const nstring::str &text, ...);
+	
 	// clean up everything and prepare to die
 	void cleanup();
 	// exit improperly
@@ -106,7 +128,7 @@ public:
 
 	// make this iteration the final one, exit the services when this is over
 	// error is set to the string passed
-	void finalize(String = String());
+	void finalize(nstring::str = nstring::str());
 	// true if this is the final iteration
 	bool isFinal();
 };

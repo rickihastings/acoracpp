@@ -22,28 +22,28 @@
 class StringParser
 {
 	// buffer
-	String buf;
+	nstring::str buf;
 	// current iterator position
-	String::iterator pos;
+	nstring::str::iterator pos;
 	
 	// get next token
-	void token(String&, char&, char&, char&);
+	void token(nstring::str&, char&, char&, char&);
 
 public:
 	// constructor
-	StringParser(const String&);
+	StringParser(const nstring::str&);
 
 	// calls token() to get next token
-	bool GetToken(String&, char sep = ' ', char sepall = 0, char front = 0);
+	bool GetToken(nstring::str&, char sep = ' ', char sepall = 0, char front = 0);
 	// skip a token
 	bool SkipToken(char sep = ' ', char sepall = 0, char front = 0);
 	// get the remaining string
-	bool GetRemaining(String&, char front = 0);
+	bool GetRemaining(nstring::str&, char front = 0);
 	
 	// reset parser, optionally with a new string
-	void Reset(String s = String());
+	void Reset(nstring::str s = nstring::str());
 	// get the entire buffer
-	void GetString(String&);
+	void GetString(nstring::str&);
 
 	// get an integer token
 	template<typename T>
@@ -54,7 +54,7 @@ public:
 template<typename T>
 bool StringParser::GetIntToken(T &i, char sep, char sepall, char front)
 {
-	String s;
+	nstring::str s;
 	
 	if (!GetToken(s, sep, sepall, front))
 		return false;

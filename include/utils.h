@@ -28,11 +28,11 @@
 namespace utils
 {
     // to str
-	template<typename T> void toStr(String&, const T &i);
-    template<typename T> String toStr(T);
+	template<typename T> void toStr(nstring::str&, const T &i);
+    template<typename T> nstring::str toStr(T);
     // to int
-    template<typename T> void toInt(T&, String&);
-	template<typename T> T toInt(String);
+    template<typename T> void toInt(T&, nstring::str&);
+	template<typename T> T toInt(nstring::str);
     // to float
     template<typename T> float toFloat(const T &i);
     // filter
@@ -40,9 +40,9 @@ namespace utils
     // explode
     template<typename T> void explode(const char* delim, T &str, std::vector<T> &tokens);
     // replace
-    void replace(String &s, String f, String r);
+    void replace(nstring::str &s, nstring::str f, nstring::str r);
 	// getDataAfter
-	template<typename T> String getDataAfter(const T &data, unsigned int where);
+	template<typename T> nstring::str getDataAfter(const T &data, unsigned int where);
 	// stripColon
 	template<typename T> void stripColon(T &data);
 }
@@ -53,7 +53,7 @@ namespace utils
  convert integer to string
 */
 template<typename T>
-void utils::toStr(String &s, const T &i)
+void utils::toStr(nstring::str &s, const T &i)
 {
     std::stringstream stream;
 	stream << i;
@@ -61,9 +61,9 @@ void utils::toStr(String &s, const T &i)
 }
 
 template<typename T>
-String utils::toStr(T i)
+nstring::str utils::toStr(T i)
 {
-    String s;
+    nstring::str s;
 	toStr<T>(s, i);
 	return s;
 }
@@ -74,14 +74,14 @@ String utils::toStr(T i)
  convert string to integer
 */
 template<typename T>
-void utils::toInt(T &i, String &s)
+void utils::toInt(T &i, nstring::str &s)
 {
     std::istringstream stream(s.c_str());
 	stream >> i;
 }
 
 template<typename T>
-T utils::toInt(String s)
+T utils::toInt(nstring::str s)
 {
 	T i;
 	toInt<T>(i, s);
@@ -155,11 +155,11 @@ template<typename T>
 void utils::explode(const char* delim, T &str, std::vector<T> &tokens)
 {
     // Skip delimiters at beginning.
-    String::size_type lastPos = str.find_first_not_of(delim, 0);
+    nstring::str::size_type lastPos = str.find_first_not_of(delim, 0);
     // Find first "non-delimiter".
-    String::size_type pos = str.find_first_of(delim, lastPos);
+    nstring::str::size_type pos = str.find_first_of(delim, lastPos);
 
-    while (String::npos != pos || String::npos != lastPos)
+    while (nstring::str::npos != pos || nstring::str::npos != lastPos)
     {
         // Found a token, add it to the vector.
         tokens.push_back(str.substr(lastPos, pos - lastPos));
@@ -175,7 +175,7 @@ void utils::explode(const char* delim, T &str, std::vector<T> &tokens)
 
  recursive str replace
 */
-inline void utils::replace(String &s, String f, String r)
+inline void utils::replace(nstring::str &s, nstring::str f, nstring::str r)
 {
     int find = 0;
     std::size_t rpos = 0;
@@ -187,7 +187,7 @@ inline void utils::replace(String &s, String f, String r)
         else
             rpos = s.find(f, rpos + (f.length() + 1));
 
-        if (rpos != String::npos)
+        if (rpos != nstring::str::npos)
         {
             ++find;
             s.replace(rpos, f.length(), r);
@@ -200,12 +200,12 @@ inline void utils::replace(String &s, String f, String r)
 /**
  utils::getDataAfter
 
- get data after (String)
+ get data after (nstring::str)
 */
 template<typename T>
-String utils::getDataAfter(const T &data, unsigned int where)
+nstring::str utils::getDataAfter(const T &data, unsigned int where)
 {
-    String returnVal = "";
+    nstring::str returnVal = "";
     unsigned int i;
 
     for (i = where; i != data.size(); ++i)

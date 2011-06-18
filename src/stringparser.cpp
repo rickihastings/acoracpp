@@ -15,24 +15,24 @@
 #include "stringparser.h"
 
 
-StringParser::StringParser(const String &s)
+StringParser::StringParser(const nstring::str &s)
 {
 	Reset(s);
 }
 
 
-void StringParser::token(String &s, char &sep, char &sepall, char &front)
+void StringParser::token(nstring::str &s, char &sep, char &sepall, char &front)
 {
 	if (front && *pos == front)
 		++pos;
 
-	String::iterator last;
+	nstring::str::iterator last;
 	
 	for (last = pos; pos != buf.end(); ++pos)
 	{
 		if (sep && *pos == sep)
 		{
-			s = String(last, pos);
+			s = nstring::str(last, pos);
 			
 			while (*pos == sep)
 				++pos;
@@ -42,22 +42,22 @@ void StringParser::token(String &s, char &sep, char &sepall, char &front)
 		else if (sepall && *pos == sepall)
 		{
 			if (pos != last)
-				s = String(last, pos);
+				s = nstring::str(last, pos);
 			else
 			{			
 				pos = buf.end();
-				s = String(last + 1, pos);
+				s = nstring::str(last + 1, pos);
 			}
 			
 			return;
 		}
 	}
 	
-	s = String(last, pos);
+	s = nstring::str(last, pos);
 }
 
 
-bool StringParser::GetToken(String &s, char sep, char sepall, char front)
+bool StringParser::GetToken(nstring::str &s, char sep, char sepall, char front)
 {
 	if (pos == buf.end())
 		return false;
@@ -76,25 +76,25 @@ bool StringParser::GetToken(String &s, char sep, char sepall, char front)
 
 bool StringParser::SkipToken(char sep, char sepall, char front)
 {
-	String s;
+	nstring::str s;
 	return GetToken(s, sep, sepall, front);
 }
 
 
-bool StringParser::GetRemaining(String &s, char front)
+bool StringParser::GetRemaining(nstring::str &s, char front)
 {
 	if (pos == buf.end())
 		return false;
 	else if (front && *pos == front)
 		++pos;
 	
-	s = String(pos, buf.end());
+	s = nstring::str(pos, buf.end());
 	pos = buf.end();
 	return !s.empty();
 }
 
 
-void StringParser::Reset(String s)
+void StringParser::Reset(nstring::str s)
 {
 	if (!s.empty())
 		buf = s;
@@ -102,7 +102,7 @@ void StringParser::Reset(String s)
 	pos = buf.begin();
 }
 
-void StringParser::GetString(String &s)
+void StringParser::GetString(nstring::str &s)
 {
 	s = buf;
 }

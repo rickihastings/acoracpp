@@ -34,7 +34,7 @@ class IRCdCommandPing : public IRCdCommand
 	public:
 		IRCdCommandPing() : IRCdCommand("PING") { }
 
-		void execute(String&, String &paramStr, std::vector<String> &params)
+		void execute(nstring::str&, nstring::str &paramStr, std::vector<nstring::str> &params)
 		{
 			// :<sid> PONG :<reply>
 			instance->socketEngine->sendString(":" + charybdis::ircd->sid + " PONG :" + params.at(0));
@@ -54,7 +54,7 @@ class IRCdCommandInit : public IRCdCommand
 	public:
 		IRCdCommandInit() : IRCdCommand("NOTICE") { }
 		
-		void execute(String&, String &paramStr, std::vector<String> &params)
+		void execute(nstring::str&, nstring::str &paramStr, std::vector<nstring::str> &params)
 		{
 			if (paramStr == "* :*** Found your hostname")
 				charybdis::ircd->initServer();
@@ -68,7 +68,7 @@ class IRCdCommandPass : public IRCdCommand
 	public:
 		IRCdCommandPass() : IRCdCommand("PASS") { }
 
-		void execute(String&, String &paramStr, std::vector<String> &params)
+		void execute(nstring::str&, nstring::str &paramStr, std::vector<nstring::str> &params)
 		{
 			charybdis::ircd->linkSid = params.at(3);
 			// ok so we've recived the pass command. Let's take the id we get and store it
@@ -83,12 +83,12 @@ class IRCdCommandServer : public IRCdCommand
 	public:
 		IRCdCommandServer() : IRCdCommand("SERVER") { }
 
-		void execute(String&, String &paramStr, std::vector<String> &params)
+		void execute(nstring::str&, nstring::str &paramStr, std::vector<nstring::str> &params)
 		{
 			charybdis::ircd->linkName = params.at(0);
 			// ok so we've recived the server command. Let's take the id we get and store it
 			
-			String time;
+			nstring::str time;
 			utils::toStr(time, instance->now);
 			// :<sid> SVINFO 6 6 0 <timestamp>
 			instance->socketEngine->sendString(":" + charybdis::ircd->sid + " SVINFO 6 6 0 " + time);
@@ -101,9 +101,9 @@ class IRCdCommandCapab : public IRCdCommand
 	public:
 		IRCdCommandCapab() : IRCdCommand("CAPAB") { }
 		
-		void execute(String&, String &paramStr, std::vector<String> &params)
+		void execute(nstring::str&, nstring::str &paramStr, std::vector<nstring::str> &params)
 		{
-			std::vector<String>::iterator it;
+			std::vector<nstring::str>::iterator it;
 			std::sort(params.begin(), params.end());
 			
 			if (!std::binary_search(params.begin(), params.end(), "SERVICES"))
@@ -118,7 +118,7 @@ class IRCdCommandSVINFO : public IRCdCommand
 	public:
 		IRCdCommandSVINFO() : IRCdCommand("SVINFO") { }
 		
-		void execute(String&, String &paramStr, std::vector<String> &params)
+		void execute(nstring::str&, nstring::str &paramStr, std::vector<nstring::str> &params)
 		{
 			instance->ircdProtocol->duringBurst = true;
 			// we recieve SVINFO upon bursts, this is how we know a burst is definately starting.
@@ -131,15 +131,28 @@ class IRCdCommandEUID : public IRCdCommand
 	public:
 		IRCdCommandEUID() : IRCdCommand("EUID") { }
 		
-		void execute(String&, String &paramStr, std::vector<String> &params)
+		void execute(nstring::str &src, nstring::str &paramStr, std::vector<nstring::str> &params)
 		{
-			String gecos = utils::getDataAfter(params, 10);
+			nstring::str gecos = utils::getDataAfter(params, 10);
 			utils::stripColon(gecos);
 			// gecos probably has a :, let's remove it for our buddy userManager
 			
-			instance->userManager->handleConnect(params.at(0), params.at(4), params.at(5), params.at(8), params.at(6), params.at(9), params.at(2), params.at(7), params.at(3), gecos);
+			instance->userManager->handleConnect(params.at(0), params.at(4), params.at(5), params.at(8), params.at(6), params.at(9), params.at(2), params.at(7), params.at(3), src, gecos);
 			// we send user manager some information about the user we just recieved. like so;
-			// > nick, username, hostname, real hostname, ip address, account name, nickts, uid, umodes, gecos
+			// > nick, username, hostname, real hostname, ip address, account name, nickts, uid, umodes, src, gecos
+		}
+};
+
+// :<source> QUIT :<quit message>
+class IRCdCommandQuit : public IRCdCommand
+{
+	public:
+		IRCdCommandQuit() : IRCdCommand("QUIT") { }
+		
+		void execute(nstring::str &src, nstring::str &paramStr, std::vector<nstring::str> &params)
+		{
+			//instance->userManager->handleQuit(src);
+			// we send the uid. into handleQuit
 		}
 };
 
@@ -187,6 +200,7 @@ charybdisProtocol::charybdisProtocol(void* h)
 	addCommand(new IRCdCommandCapab);
 	addCommand(new IRCdCommandSVINFO);
 	addCommand(new IRCdCommandEUID);
+	addCommand(new IRCdCommandQuit);
 	addCommand(new IRCdCommandPing);
 }
 
@@ -203,9 +217,9 @@ void charybdisProtocol::duringBurst()
 void charybdisProtocol::initServer()
 {
 	// PASS <password> TS 6 :<sid>
-	instance->socketEngine->sendString("PASS " + instance->configReader->getValue<String>("remoteserver", "password", String()) + " TS 6 :" + sid);
+	instance->socketEngine->sendString("PASS " + instance->configReader->getValue<nstring::str>("remoteserver", "password", nstring::str()) + " TS 6 :" + sid);
 	// CAPAB :<supported capab>
 	instance->socketEngine->sendString("CAPAB :QS EX CHW IE KLN KNOCK TB UNKLN CLUSTER ENCAP SERVICES RSFNC SAVE EUID EOPMOD BAN MLOCK");
 	// SERVER <servername> <hopcount> :<description>
-	instance->socketEngine->sendString("SERVER " + instance->configReader->getValue<String>("servicesserver", "name", String()) + " 0 :" + instance->configReader->getValue<String>("servicesserver", "desc", String()));
+	instance->socketEngine->sendString("SERVER " + instance->configReader->getValue<nstring::str>("servicesserver", "name", nstring::str()) + " 0 :" + instance->configReader->getValue<nstring::str>("servicesserver", "desc", nstring::str()));
 }

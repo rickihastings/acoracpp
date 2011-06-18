@@ -15,22 +15,22 @@
 #ifndef	COMMAND_H
 #define	COMMAND_H
 
-#include "extensible.h"
+#include "base.h"
 
 // base class for commands
-class Command : public Extensible
+class Command
 {
 public:
 	// command name
-	const String name;
+	const nstring::str name;
 
 	// consturctor
-	Command(const String);
+	Command(const nstring::str);
 	// destructor
 	virtual ~Command();
 
 	// execute the command
-	virtual ErrorCode execute(String&) = 0;
+	virtual ErrorCode execute(nstring::str&) = 0;
 };
 
 #endif // COMMAND_H

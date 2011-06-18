@@ -9,31 +9,63 @@
 //      Please see the file COPYING for details.     //
 //                                                   //
 //===================================================//
-// $Id: user.h 707 2009-01-31 21:52:15Z ankit $
-//===================================================//
 
 #ifndef	USER_H
 #define	USER_H
 
-#include "extensible.h"
+#include "base.h"
 
-class Server;
+/**
+ User
 
-// a user on the network
-class User : public Extensible
+ user struct
+*/
+struct User
 {
-public:
-	// nick of the user
-	String nick;
-	// ident of the user
-	String ident;
-	// vhost of the user
-	String vHost;
+    // id
+    int id;
+    // uid
+    nstring::str uid;
+    // nick
+    nstring::str nick;
+    // ident
+    nstring::str ident;
+    // host
+    nstring::str host;
+    // old host
+    nstring::str oldHost;
+	// real host
+	nstring::str realHost;
+	// ip address
+	nstring::str ipAddress;
+	
+	// modes
+	nstring::str modes;
+    // gecos
+    nstring::str gecos;
+    // server
+    nstring::str server;
+    // connect timestamp
+    std::time_t timeStamp;
+	
+    // oper
+    bool oper;
+	// identified
+	bool identified;
+    // oper privs
+    nstring::str privs;
 
-	// constructor
-	User();
-	// destructor
-	virtual ~User();
+    // account name
+    nstring::str accountName;
+    // use privmsg
+    bool usePrivmsg;
+    // language
+    nstring::str language;	
+
+    // constructor
+	User(nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, std::time_t&);
+    // destructor
+    virtual ~User();
 };
 
 #endif // USER_H

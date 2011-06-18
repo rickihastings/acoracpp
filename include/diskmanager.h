@@ -15,21 +15,21 @@
 #ifndef	DISKMANAGER_H
 #define	DISKMANAGER_H
 
-#include "extensible.h"
+#include "base.h"
 
 // base class for disk managers, these modules provide
 // a way of writing and reading databases to and from
 // disk
-class DiskManager : public Extensible
+class DiskManager
 {
 public:
 	// module handle
 	const void* handle;
 	// module version
-	const String version;
+	const nstring::str version;
 
 	// constructor
-	DiskManager(void*, const String version);
+	DiskManager(void*, const nstring::str version);
 	// destructor
 	virtual ~DiskManager();
 };

@@ -14,7 +14,7 @@
 
 #include "socketengine.h"
 
-SocketEngine::SocketEngine(void* h, const String ver) :
+SocketEngine::SocketEngine(void* h, const nstring::str ver) :
 	connected(false),
 	handle(h),
 	version(ver)
@@ -23,7 +23,7 @@ SocketEngine::SocketEngine(void* h, const String ver) :
 SocketEngine::~SocketEngine()
 { }
 
-ErrorCode SocketEngine::sendString(String buf)
+ErrorCode SocketEngine::sendString(nstring::str buf)
 {
 	return send(buf);
 }

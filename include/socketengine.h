@@ -15,7 +15,7 @@
 #ifndef	SOCKETENGINE_H
 #define	SOCKETENGINE_H
 
-#include "extensible.h"
+#include "base.h"
 
 // errors for socketengine
 namespace err
@@ -46,7 +46,7 @@ namespace err
 // base class for socket engines, these modules provide
 // a way of managing sockets and connections with the
 // remote server
-class SocketEngine : public Extensible
+class SocketEngine
 {
 protected:
 	// true if connection is established
@@ -56,10 +56,10 @@ public:
 	// module handle
 	const void* handle;
 	// module version
-	const String version;
+	const nstring::str version;
 
 	// constructor
-	SocketEngine(void*, const String version);
+	SocketEngine(void*, const nstring::str version);
 	// destructor
 	virtual ~SocketEngine();
 
@@ -69,14 +69,14 @@ public:
 	// connect to remote server
 	virtual ErrorCode connect() = 0;
 	// send data
-	virtual ErrorCode send(String&) = 0;
+	virtual ErrorCode send(nstring::str&) = 0;
 	// receive data
-	virtual ErrorCode recv(String&) = 0;
+	virtual ErrorCode recv(nstring::str&) = 0;
 	// disconnect
 	virtual ErrorCode disconnect() = 0;
 
 	// send string
-	virtual ErrorCode sendString(String);
+	virtual ErrorCode sendString(nstring::str);
 };
 
 // macro to initialize a socket engine

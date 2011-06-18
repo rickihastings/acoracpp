@@ -15,7 +15,7 @@
 #ifndef	CONFIGREADER_H
 #define	CONFIGREADER_H
 
-#include "extensible.h"
+#include "base.h"
 
 #include <map>
 #include <deque>
@@ -37,14 +37,14 @@ namespace err
 }
 
 // reads config file and saves values
-class ConfigReader : public Extensible
+class ConfigReader
 {
 protected:
 	// the actual read procedure called by public Read()
-	virtual ErrorCode read(const String &file, std::deque<String> &errors, std::deque<String> &fileStack, std::map<std::string, std::map<std::string, std::deque<String> > > &vals);
+	virtual ErrorCode read(const nstring::str &file, std::deque<nstring::str> &errors, std::deque<nstring::str> &fileStack, std::map<std::string, std::map<std::string, std::deque<nstring::str> > > &vals);
 
 	// data read from the config file
-	std::map<std::string, std::map<std::string, std::deque<String> > > values;
+	std::map<std::string, std::map<std::string, std::deque<nstring::str> > > values;
 
 public:
 	// constructor
@@ -53,29 +53,29 @@ public:
 	virtual ~ConfigReader();
 
 	// read config file
-	virtual ErrorCode read(const String file, std::deque<String> &errors);
+	virtual ErrorCode read(const nstring::str file, std::deque<nstring::str> &errors);
 
 	// true if the requested key has a blank value or doesn't exist. block and key must be lowercase.
-	virtual bool isEmpty(const std::string block, const std::string key, std::map<std::string, std::map<std::string, std::deque<String> > >* vals = NULL);
+	virtual bool isEmpty(const std::string block, const std::string key, std::map<std::string, std::map<std::string, std::deque<nstring::str> > >* vals = NULL);
 
 	// get a string value from config file. block and key must be lowercase.
-	virtual void getValue(String &in, const std::string block, const std::string key, String def = String(), std::map<std::string, std::map<std::string, std::deque<String> > >* vals = NULL);
+	virtual void getValue(nstring::str &in, const std::string block, const std::string key, nstring::str def = nstring::str(), std::map<std::string, std::map<std::string, std::deque<nstring::str> > >* vals = NULL);
 	// get an integer value from config file. block and key must be lowercase.
-	virtual void getValue(int &in, const std::string block, const std::string key, int def = 0, std::map<std::string, std::map<std::string, std::deque<String> > >* vals = NULL);
+	virtual void getValue(int &in, const std::string block, const std::string key, int def = 0, std::map<std::string, std::map<std::string, std::deque<nstring::str> > >* vals = NULL);
 	// get a bool value from config file. "yes"/"true"/"1" is true, "no"/"false"/"0" is false. block and key must be lowercase.
-	virtual void getValue(bool &in, const std::string block, const std::string key, bool def, std::map<std::string, std::map<std::string, std::deque<String> > >* vals = NULL);
+	virtual void getValue(bool &in, const std::string block, const std::string key, bool def, std::map<std::string, std::map<std::string, std::deque<nstring::str> > >* vals = NULL);
 
 	// get multiple string value from config file. block and key must be lowercase.
-	virtual void getValues(std::deque<String> &in, const std::string block, const std::string key, std::map<std::string, std::map<std::string, std::deque<String> > >* vals = NULL);
+	virtual void getValues(std::deque<nstring::str> &in, const std::string block, const std::string key, std::map<std::string, std::map<std::string, std::deque<nstring::str> > >* vals = NULL);
 
 	// return values instead of having to pass references. block and key must be lowercase.
 	template<typename T>
-	T getValue(const std::string block, const std::string key, T def, std::map<std::string, std::map<std::string, std::deque<String> > >* vals = NULL);
+	T getValue(const std::string block, const std::string key, T def, std::map<std::string, std::map<std::string, std::deque<nstring::str> > >* vals = NULL);
 };
 
 // implementation of the getValue template
 template<typename T>
-T ConfigReader::getValue(const std::string block, const std::string key, T def, std::map<std::string, std::map<std::string, std::deque<String> > >* vals)
+T ConfigReader::getValue(const std::string block, const std::string key, T def, std::map<std::string, std::map<std::string, std::deque<nstring::str> > >* vals)
 {
 	T ret;
 	getValue(ret, block, key, def, vals);
