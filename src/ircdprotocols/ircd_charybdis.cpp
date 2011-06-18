@@ -22,6 +22,7 @@
 #include "exception.h"
 #include "usermanager.h"
 #include "channelmanager.h"
+#include "modeparser.h"
 
 #include <iostream>
 #include <algorithm>
@@ -213,7 +214,12 @@ class IRCdCommandUMode : public IRCdCommand
 			instance->userManager->handleMode(params.at(0), modes);
 			// we send the new modes into handleMode, which is parsed by mode class.
 			
+			/*irc::modes modeContainer;
+			irc::params paramContainer;
+			instance->modeParser->sortModes(modes, modeContainer, paramContainer);
 			// here we also parse +o into handleOperUp
+			
+			std::cout << modeContainer["plus"].c_str() << std::endl;*/
 		}
 };
 
@@ -232,12 +238,9 @@ class IRCdCommandCHGHost : public IRCdCommand
 
 // SERVER METHODS
 
-charybdisServer::charybdisServer()
-{ }
+charybdisServer::charybdisServer() { }
 
-charybdisServer::~charybdisServer()
-{ }
-
+charybdisServer::~charybdisServer() { }
 
 // PROTOCOL METHODS
 
@@ -292,9 +295,7 @@ charybdisProtocol::charybdisProtocol(void* h)
 	addCommand(new IRCdCommandPing);
 }
 
-
-charybdisProtocol::~charybdisProtocol()
-{ }
+charybdisProtocol::~charybdisProtocol() { }
 
 void charybdisProtocol::duringBurst()
 {

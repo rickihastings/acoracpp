@@ -59,6 +59,7 @@ class ModuleManager;
 class ConfigReader;
 class UserManager;
 class ChannelManager;
+class ModeParser;
 class SocketEngine;
 class IRCdProtocol;
 class DiskManager;
@@ -104,6 +105,8 @@ public:
 	UserManager* userManager;
 	// channel manager
 	ChannelManager* channelManager;
+	// mode parser
+	ModeParser* modeParser;
 
 	// constructor
 	Instance(int &argc, char **argv, const bool &enabledebug);

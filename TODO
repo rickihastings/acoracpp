@@ -8,3 +8,4 @@
 * parse QUIT in S2S and remove the user class in userManager accordingly. (DONE)
 * parse NICK in S2S and update user class in userManager. (DONE)
 * Storage container for servers in IrcdProtocol class, also create a function to return server from sID, and sID from server
+* start mode parser etc

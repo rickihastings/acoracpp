@@ -21,6 +21,7 @@
 #include "config.h"
 #include "usermanager.h"
 #include "channelmanager.h"
+#include "modeparser.h"
 
 #include <iostream>
 #include <cerrno>
@@ -63,7 +64,8 @@ Instance::Instance(int &ac, char **av, const bool &d) :
 	diskManager(NULL),
 	configReader(NULL),
 	userManager(NULL),
-	channelManager(NULL)
+	channelManager(NULL),
+	modeParser(NULL)
 { }
 
 
@@ -79,6 +81,7 @@ void Instance::cleanup()
 	if (configReader)	DELETE(configReader);
 	if (userManager)	DELETE(userManager);
 	if (channelManager)	DELETE(channelManager);
+	if (modeParser)		DELETE(modeParser);
 	
 	log(INFO, "Instance(): Cleanup complete.");
 }
@@ -125,36 +128,6 @@ ErrorCode Instance::start()
 			return err::exit::configreader;
 		}
 	}
-	
-	// set our log level (std::vector<int>) (believe it or not)
-    /*nstring::str loglevel = "info error network rawdata logchan";
-    std::vector<nstring::str> loglevels;
-	
-	utils::explode(" ", loglevel, loglevels);
-    for (std::vector<nstring::str>::iterator i = loglevels.begin(); i != loglevels.end(); ++i)
-    {
-        if (*i == "all")
-            logLevel[ALL] = *i;
-        if (*i == "info")
-            logLevel[INFO] = *i;
-        if (*i == "error")
-            logLevel[ERROR] = *i;
-        if (*i == "network")
-            logLevel[NETWORK] = *i;
-        if (*i == "commands")
-            logLevel[COMMANDS] = *i;
-        if (*i == "admin")
-            logLevel[ADMIN] = *i;
-        if (*i == "register")
-            logLevel[REGISTER] = *i;
-        if (*i == "rawdata")
-            logLevel[RAWDATA] = *i;
-        if (*i == "logchan")
-            logLevel[LOGCHAN] = *i;
-    }
-    iterators[ALL] = logLevel.find(ALL);
-    iterators[INFO] = logLevel.find(INFO);
-    iterators[RAWDATA]= logLevel.find(RAWDATA);*/
 	
 	// create module manager
 	moduleManager = new ModuleManager;
@@ -216,6 +189,7 @@ ErrorCode Instance::start()
 	// initialize user and channel managers
 	userManager = new UserManager;
 	channelManager = new ChannelManager;
+	modeParser = new ModeParser;
 
 	return run();
 }
