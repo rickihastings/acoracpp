@@ -22,7 +22,7 @@
 class UserManager
 {
 	// uid map
-	std::map<nstring::str, nstring::str&> uidMap;
+	std::map<nstring::str, nstring::str> uidMap;
 	// internal user map
 	std::map<nstring::str, User*> users;
 	

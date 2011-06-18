@@ -53,6 +53,8 @@ void IRCdProtocol::processBuffer(nstring::str &buf, IRCdCommand* parent, nstring
 	
 	if (getsrc)
 		p.GetToken(src);
+	src = utils::trim(src, nstring::str(" "));
+	// get src
 	
 	p.GetToken(cmd);
 	if (parent)

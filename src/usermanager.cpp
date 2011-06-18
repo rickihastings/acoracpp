@@ -57,9 +57,13 @@ void UserManager::handleConnect(nstring::str &nick, nstring::str &ident, nstring
 	std::map<nstring::str, User*>::iterator it = users.end();
 	users.insert(it, std::pair<nstring::str, User*>(unick, new User(uid, nick, ident, host, realhost, ip, modes, gecos, sid, timeStamp)));
 	// insert user into array
-	std::map<nstring::str, nstring::str&>::iterator i = uidMap.end();
-	uidMap.insert(i, std::pair<nstring::str, nstring::str&>(uid, unick));
+	std::map<nstring::str, nstring::str>::iterator i = uidMap.end();
+	uidMap.insert(i, std::pair<nstring::str, nstring::str>(uid, unick));
 	// insert user into uid map so we can find it easily
+	
+	instance->log(NETWORK, "handleConnect(): " + nick + "!" + ident + "@" + host + " has connected to " + sid);
+	//instance->log(LOGCHAN, "// TODO");
+	// log things, ie LOGCHAN and NETWORK
 }
 
 /**
@@ -73,17 +77,26 @@ void UserManager::handleQuit(nstring::str &uid)
 	getNickFromId(uid, nick);
 	// get nickname from uid.
 	
+	std::map<nstring::str, nstring::str>::iterator i = uidMap.find(uid);
 	std::map<nstring::str, User*>::iterator it = users.find(nick);
-	if (it != users.end())
+	if (i != uidMap.end() && it != users.end())
 	{
+		instance->log(NETWORK, "handleQuit(): " + it->second->nick + "!" + it->second->ident + "@" + it->second->host + " has disconnected from " + it->second->server);
+		//instance->log(LOGCHAN, "// TODO");
+		// log things, ie LOGCHAN and NETWORK
+	
 		delete it->second;
 		users.erase(it);
+		uidMap.erase(i);
+		// remove the user
+		
 		return;
+		// we're done, bail!
 	}
 	// user deleted
 	
 	instance->log(ERROR, "handleQuit(): Cannot find the user in user map, this will possibly cause a leak!");
-	// something has SERIOUSLY gone wrong here.
+	// log a few things here
 }
 
 /**
@@ -93,9 +106,13 @@ void UserManager::handleQuit(nstring::str &uid)
 */
 void UserManager::getNickFromId(nstring::str &uid, nstring::str &nick)
 {
-	std::map<nstring::str, nstring::str&>::iterator it = uidMap.find(uid);
-	nick = it->second;
-	// get user from id
+	std::map<nstring::str, nstring::str>::iterator it = uidMap.begin();
+	
+	if (it != uidMap.end()){
+		nick = it->second;
+	}else{
+		instance->log(ERROR, "getNickFromId(): Unable to find uid in uidMap, this WILL cause problems!");}
+	// get user from id, if we can!
 }
 
 /**

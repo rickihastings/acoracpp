@@ -37,6 +37,10 @@ namespace utils
     template<typename T> float toFloat(const T &i);
     // filter
     template<typename T> void filter(T &str);
+	// trim
+	template<typename T> inline T left_trim(const T& src, const T& to_trim);
+	template<typename T> inline T right_trim(const T& src, const T& to_trim);
+	template<typename T> inline T trim(const T& src, const T& to_trim);
     // explode
     template<typename T> void explode(const char* delim, T &str, std::vector<T> &tokens);
     // replace
@@ -145,6 +149,34 @@ void utils::filter(T &str)
 
     str = newStr;
 }
+
+/**
+ utils::left_trim
+*/
+template<typename T>
+inline T utils::left_trim(const T& src, const T& to_trim)
+{
+	if(!src.length())
+		return src;
+	return src.substr(src.find_first_not_of(to_trim));
+}
+
+/**
+ utils::right_trim
+*/
+template<typename T>
+inline T utils::right_trim(const T& src, const T& to_trim)
+{
+	if(!src.length())
+		return src;
+	return src.substr(0, src.find_last_not_of(to_trim) + 1);
+}
+
+/**
+ utils::trim
+*/
+template<typename T>
+inline T utils::trim(const T& src, const T& to_trim) { return utils::right_trim(utils::left_trim(src, to_trim), to_trim); }
 
 /**
  utils::explode

@@ -151,7 +151,7 @@ class IRCdCommandQuit : public IRCdCommand
 		
 		void execute(nstring::str &src, nstring::str &paramStr, std::vector<nstring::str> &params)
 		{
-			//instance->userManager->handleQuit(src);
+			instance->userManager->handleQuit(src);
 			// we send the uid. into handleQuit
 		}
 };
