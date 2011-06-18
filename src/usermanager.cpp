@@ -54,11 +54,8 @@ void UserManager::handleConnect(nstring::str &nick, nstring::str &ident, nstring
 	nstring::str unick = nick;
 	std::transform(unick.begin(), unick.end(), unick.begin(), ::tolower);
 	
-	std::map<nstring::str, User*>::iterator it = users.end();
-	users.insert(it, std::pair<nstring::str, User*>(unick, new User(uid, nick, ident, host, realhost, ip, modes, gecos, sid, timeStamp)));
-	// insert user into array
-	std::map<nstring::str, nstring::str>::iterator i = uidMap.end();
-	uidMap.insert(i, std::pair<nstring::str, nstring::str>(uid, unick));
+	users.insert(std::pair<nstring::str, User*>(unick, new User(uid, nick, ident, host, realhost, ip, modes, gecos, sid, timeStamp)));
+	uidMap.insert(std::pair<nstring::str, nstring::str>(uid, unick));
 	// insert user into uid map so we can find it easily
 	
 	instance->log(NETWORK, "handleConnect(): " + nick + "!" + ident + "@" + host + " has connected to " + sid);
@@ -100,6 +97,42 @@ void UserManager::handleQuit(nstring::str &uid)
 }
 
 /**
+ UserManager::handleNick
+
+ handle nick, renames our nick in users and uidMap
+*/
+void UserManager::handleNick(nstring::str&uid, nstring::str &nick)
+{
+	static User* userHolder;
+	nstring::str userNick;
+	getNickFromId(uid, userNick);
+	// get the class from users
+	nstring::str lnick = nick;
+	std::transform(lnick.begin(), lnick.end(), lnick.begin(), ::tolower);
+	// tolower our nick
+	
+	std::map<nstring::str, User*>::iterator it = users.find(userNick);
+	std::map<nstring::str, nstring::str>::iterator i = uidMap.find(uid);
+	// find uid maps
+	
+	instance->log(NETWORK, "handleNick(): " + it->second->nick + "!" + it->second->ident + "@" + it->second->host + " changed nick to " + nick);
+	//instance->log(LOGCHAN, "// TODO");
+	// log things, ie LOGCHAN and NETWORK
+	
+	if (it != users.end())
+		userHolder = it->second;
+	if (i != uidMap.end())
+		i->second = lnick;
+		
+	userHolder->oldNick = userHolder->nick;
+	userHolder->nick = nick;
+		
+	users.insert(std::pair<nstring::str, User*>(lnick, userHolder));
+	users.erase(it);
+	// update some info
+}
+
+/**
  UserManager::getNickFromId
 
  get nickname from id
@@ -108,20 +141,48 @@ void UserManager::getNickFromId(nstring::str &uid, nstring::str &nick)
 {
 	std::map<nstring::str, nstring::str>::iterator it = uidMap.begin();
 	
-	if (it != uidMap.end()){
+	if (it != uidMap.end())
 		nick = it->second;
-	}else{
-		instance->log(ERROR, "getNickFromId(): Unable to find uid in uidMap, this WILL cause problems!");}
+	else
+		instance->log(ERROR, "getNickFromId(): Unable to find uid in uidMap, this WILL cause problems!");
 	// get user from id, if we can!
+}
+
+/**
+ UserManager::getUserFromId
+
+ return User* from id
+*/
+User* UserManager::getUserFromId(nstring::str &uid)
+{
+	nstring::str nick;
+	getNickFromId(uid, nick);
+	// get nickname from uid.
+	
+	return getUser(nick);
+	// make use of getUser to return User* from nick.
 }
 
 /**
  UserManager::getUser
 
- get user from id
+ return User* from nick
 */
-/*User* UserManager::getUser(nstring::str &uid)
+User* UserManager::getUser(nstring::str &nick)
 {
-
-}*/
-
+	nstring::str unick = nick;
+	std::transform(unick.begin(), unick.end(), unick.begin(), ::tolower);
+	// to lower it, seen as though everything in users is tolower.
+	
+	std::map<nstring::str, User*>::iterator it = users.find(unick);
+	if (it != users.end())
+	{
+		return it->second;
+	}
+	else
+	{
+		instance->log(ERROR, "getUser(): trying to find invalid user, this can cause serious issues!");
+		return NULL;
+	}
+	// find the user class from our nick
+}

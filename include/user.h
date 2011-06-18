@@ -22,12 +22,12 @@
 */
 struct User
 {
-    // id
-    int id;
     // uid
     nstring::str uid;
     // nick
     nstring::str nick;
+	// old nick
+	nstring::str oldNick;
     // ident
     nstring::str ident;
     // host
@@ -60,7 +60,7 @@ struct User
     // use privmsg
     bool usePrivmsg;
     // language
-    nstring::str language;	
+    nstring::str language;
 
     // constructor
 	User(nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, std::time_t&);

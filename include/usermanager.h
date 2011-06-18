@@ -37,11 +37,15 @@ public:
 	void handleConnect(nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&);
 	// handle quit
 	void handleQuit(nstring::str&);
+	// handle nick
+	void handleNick(nstring::str&, nstring::str&);
 	
 	// get nickname from id
 	void getNickFromId(nstring::str&, nstring::str&);
+	// get user from id
+	User* getUserFromId(nstring::str&);
 	// get user
-	//nstring::str GetUser(nstring::str&);
+	User* getUser(nstring::str&);
 };
 
 #endif // USERMANAGER_H

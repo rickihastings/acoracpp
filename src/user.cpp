@@ -22,6 +22,7 @@
 User::User(nstring::str &u, nstring::str &n, nstring::str &i, nstring::str &h, nstring::str &rh, nstring::str& ip, nstring::str &m, nstring::str &g, nstring::str &s, std::time_t &ts) :
     uid(u),
     nick(n),
+	oldNick(""),
     ident(i),
     host(h),
 	oldHost(h),

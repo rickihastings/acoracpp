@@ -156,6 +156,19 @@ class IRCdCommandQuit : public IRCdCommand
 		}
 };
 
+// :<source> NICK <nick> :<timestamp>
+class IRCdCommandNick : public IRCdCommand
+{
+	public:
+		IRCdCommandNick() : IRCdCommand("NICK") { }
+		
+		void execute(nstring::str &src, nstring::str &paramStr, std::vector<nstring::str> &params)
+		{
+			instance->userManager->handleNick(src, params.at(0));
+			// we send the uid. into handleQuit
+		}
+};
+
 // SERVER METHODS
 
 charybdisServer::charybdisServer()
@@ -201,6 +214,7 @@ charybdisProtocol::charybdisProtocol(void* h)
 	addCommand(new IRCdCommandSVINFO);
 	addCommand(new IRCdCommandEUID);
 	addCommand(new IRCdCommandQuit);
+	addCommand(new IRCdCommandNick);
 	addCommand(new IRCdCommandPing);
 }
 
