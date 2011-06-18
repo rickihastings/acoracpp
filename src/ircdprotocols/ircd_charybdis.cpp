@@ -49,10 +49,10 @@ class IRCdCommandPing : public IRCdCommand
 };
 
 // :<source> NOTICE <target> :<message>
-class IRCdCommandInit : public IRCdCommand
+class IRCdCommandNotice : public IRCdCommand
 {
 	public:
-		IRCdCommandInit() : IRCdCommand("NOTICE") { }
+		IRCdCommandNotice() : IRCdCommand("NOTICE") { }
 		
 		void execute(nstring::str&, nstring::str &paramStr, std::vector<nstring::str> &params)
 		{
@@ -71,7 +71,7 @@ class IRCdCommandPass : public IRCdCommand
 		void execute(nstring::str&, nstring::str &paramStr, std::vector<nstring::str> &params)
 		{
 			charybdis::ircd->linkSid = params.at(3);
-			// ok so we've recived the pass command. Let's take the id we get and store it
+			// ok so we've recived the pass command. Let's take the id we get and store it (this only stores the last link)
 			utils::stripColon(charybdis::ircd->linkSid);
 			// no doubt there is a : at the start, remove that.
 		}
@@ -86,7 +86,10 @@ class IRCdCommandServer : public IRCdCommand
 		void execute(nstring::str&, nstring::str &paramStr, std::vector<nstring::str> &params)
 		{
 			charybdis::ircd->linkName = params.at(0);
-			// ok so we've recived the server command. Let's take the id we get and store it
+			// ok so we've recived the server command. Let's take the id we get and store it (this only stores the last link)
+			
+			charybdis::ircd->addServer(charybdis::ircd->linkName, charybdis::ircd->linkSid);
+			// send data to the core
 			
 			nstring::str time;
 			utils::toStr(time, instance->now);
@@ -122,6 +125,32 @@ class IRCdCommandSVINFO : public IRCdCommand
 		{
 			instance->ircdProtocol->duringBurst = true;
 			// we recieve SVINFO upon bursts, this is how we know a burst is definately starting.
+		}
+};
+
+// SQUIT <sid> :<quit message>
+class IRCdCommandSQuit : public IRCdCommand
+{
+	public:
+		IRCdCommandSQuit() : IRCdCommand("SQUIT") { }
+
+		void execute(nstring::str&, nstring::str &paramStr, std::vector<nstring::str> &params)
+		{
+			charybdis::ircd->remServer(params.at(0));
+			// send data to the core
+		}
+};
+
+// ERROR :<message>
+class IRCdCommandError : public IRCdCommand
+{
+	public:
+		IRCdCommandError() : IRCdCommand("ERROR") { }
+		
+		void execute(nstring::str&, nstring::str &paramStr, std::vector<nstring::str> &params)
+		{
+			instance->log(ERROR, "processBuffer(): " + paramStr);
+			// log this, quite important.
 		}
 };
 
@@ -169,6 +198,36 @@ class IRCdCommandNick : public IRCdCommand
 		}
 };
 
+// :<source> MODE <nick> :<modes>
+class IRCdCommandUMode : public IRCdCommand
+{
+	public:
+		IRCdCommandUMode() : IRCdCommand("MODE") { }
+		
+		void execute(nstring::str&, nstring::str &paramStr, std::vector<nstring::str> &params)
+		{
+			nstring::str modes = params.at(1);
+			utils::stripColon(modes);
+			instance->userManager->handleMode(params.at(0), modes);
+			// we send the new modes into handleMode, which is parsed by mode class.
+			
+			// here we also parse +o into handleOperUp
+		}
+};
+
+// :<source> CHGHOST <uid> <new host>
+class IRCdCommandCHGHost : public IRCdCommand
+{
+	public:
+		IRCdCommandCHGHost() : IRCdCommand("CHGHOST") { }
+		
+		void execute(nstring::str &src, nstring::str &paramStr, std::vector<nstring::str> &params)
+		{
+			instance->userManager->handleHost(params.at(0), params.at(1));
+			// we send the uid. into handleQuit
+		}
+};
+
 // SERVER METHODS
 
 charybdisServer::charybdisServer()
@@ -205,16 +264,23 @@ charybdisProtocol::charybdisProtocol(void* h)
 	
 	// read our name
 	instance->configReader->getValue(name, "servicesserver", "name");
+	
+	addServer(name, sid);
+	// add our server.
 
 	// add commands.
-	addCommand(new IRCdCommandInit);
+	addCommand(new IRCdCommandNotice);
 	addCommand(new IRCdCommandPass);
 	addCommand(new IRCdCommandServer);
 	addCommand(new IRCdCommandCapab);
 	addCommand(new IRCdCommandSVINFO);
+	addCommand(new IRCdCommandSQuit);
+	addCommand(new IRCdCommandError);
 	addCommand(new IRCdCommandEUID);
 	addCommand(new IRCdCommandQuit);
 	addCommand(new IRCdCommandNick);
+	addCommand(new IRCdCommandUMode);
+	addCommand(new IRCdCommandCHGHost);
 	addCommand(new IRCdCommandPing);
 }
 

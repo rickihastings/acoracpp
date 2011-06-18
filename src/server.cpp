@@ -9,14 +9,12 @@
 //      Please see the file COPYING for details.     //
 //                                                   //
 //===================================================//
-// $Id: server.cpp 691 2009-01-29 08:15:06Z ankit $
-//===================================================//
 
 #include "server.h"
 
-Server::Server()
-{ }
+Server::Server(nstring::str &s, nstring::str &id) :
+	name(s),
+	sid(id) { }
 
 Server::~Server()
 { }
-

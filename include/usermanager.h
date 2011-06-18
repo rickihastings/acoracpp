@@ -39,6 +39,12 @@ public:
 	void handleQuit(nstring::str&);
 	// handle nick
 	void handleNick(nstring::str&, nstring::str&);
+	// handle mode
+	void handleMode(nstring::str&, nstring::str&);
+	// handle host
+	void handleHost(nstring::str&, nstring::str&);
+	// handle oper up
+	void handleOperUp(nstring::str&);
 	
 	// get nickname from id
 	void getNickFromId(nstring::str&, nstring::str&);

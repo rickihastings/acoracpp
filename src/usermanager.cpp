@@ -101,7 +101,7 @@ void UserManager::handleQuit(nstring::str &uid)
 
  handle nick, renames our nick in users and uidMap
 */
-void UserManager::handleNick(nstring::str&uid, nstring::str &nick)
+void UserManager::handleNick(nstring::str &uid, nstring::str &nick)
 {
 	static User* userHolder;
 	nstring::str userNick;
@@ -119,10 +119,8 @@ void UserManager::handleNick(nstring::str&uid, nstring::str &nick)
 	//instance->log(LOGCHAN, "// TODO");
 	// log things, ie LOGCHAN and NETWORK
 	
-	if (it != users.end())
-		userHolder = it->second;
-	if (i != uidMap.end())
-		i->second = lnick;
+	userHolder = it->second;
+	i->second = lnick;
 		
 	userHolder->oldNick = userHolder->nick;
 	userHolder->nick = nick;
@@ -130,6 +128,49 @@ void UserManager::handleNick(nstring::str&uid, nstring::str &nick)
 	users.insert(std::pair<nstring::str, User*>(lnick, userHolder));
 	users.erase(it);
 	// update some info
+}
+
+/**
+ UserManager::handleMode
+
+ handle mode changes
+*/
+void UserManager::handleMode(nstring::str &uid, nstring::str &modes)
+{
+	
+}
+
+/**
+ UserManager::handleHost
+
+ handle host changes, typically CHGHOST
+*/
+void UserManager::handleHost(nstring::str &uid, nstring::str &host)
+{
+	nstring::str userNick;
+	getNickFromId(uid, userNick);
+	// get the class from users
+	
+	std::map<nstring::str, User*>::iterator it = users.find(userNick);
+	// find uid maps
+	
+	instance->log(NETWORK, "handleHost(): " + it->second->nick + "!" + it->second->ident + "@" + it->second->host + " changed hostname to " + host);
+	//instance->log(LOGCHAN, "// TODO");
+	// log things, ie LOGCHAN and NETWORK
+	
+	it->second->oldHost = it->second->host;
+	it->second->host = host;
+	// update host name ^_^
+}
+
+/**
+ UserManager::handleOperUp
+
+ handle oper ups
+*/
+void UserManager::handleOperUp(nstring::str &uid)
+{
+	
 }
 
 /**

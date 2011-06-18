@@ -19,7 +19,7 @@
 #include <deque>
 
 // a charybdis server
-class charybdisServer : public Server
+class charybdisServer
 {
 public:
 	// constructor

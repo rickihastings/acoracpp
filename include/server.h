@@ -9,8 +9,6 @@
 //      Please see the file COPYING for details.     //
 //                                                   //
 //===================================================//
-// $Id: server.h 697 2009-01-29 16:08:40Z ankit $
-//===================================================//
 
 #ifndef SERVER_H
 #define SERVER_H
@@ -21,8 +19,14 @@
 class Server
 {
 public:
+
+	// name
+	nstring::str name;
+	// sid
+	nstring::str sid;
+
 	// constructor
-	Server();
+	Server(nstring::str&, nstring::str&);
 	// destructor
 	virtual ~Server();
 };

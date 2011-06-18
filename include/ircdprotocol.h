@@ -9,8 +9,6 @@
 //      Please see the file COPYING for details.     //
 //                                                   //
 //===================================================//
-// $Id: ircdprotocol.h 708 2009-02-01 11:48:00Z ankit $
-//===================================================//
 
 #ifndef	IRCDPROTOCOL_H
 #define	IRCDPROTOCOL_H
@@ -67,6 +65,11 @@ public:
 	virtual void processBuffer(nstring::str&, IRCdCommand* parent = NULL, nstring::str src = nstring::str());
 	// add a command
 	virtual ErrorCode addCommand(IRCdCommand*);
+	
+	// add server
+	void addServer(nstring::str&, nstring::str&);
+	// remove server
+	void remServer(nstring::str&);
 };
 
 // macro to initialize an ircd protocol
