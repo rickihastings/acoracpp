@@ -9,8 +9,6 @@
 //      Please see the file COPYING for details.     //
 //                                                   //
 //===================================================//
-// $Id: ircd_charybdis.h 702 2009-01-31 18:50:56Z ankit $
-//===================================================//
 
 #include "ircdprotocol.h"
 #include "ircdcommand.h"

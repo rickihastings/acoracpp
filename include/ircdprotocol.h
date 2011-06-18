@@ -44,8 +44,24 @@ public:
 	// module version
 	const nstring::str version;
 
-	// ircd requires a numeric to be specified
+	// ircd requires a numeric to be specified, some more setting based variables
+	// data from the ircd
 	bool requireNumeric;
+	int maxParams;
+	nstring::str capabModes;
+	nstring::str prefixData;
+	nstring::str defaultChanModes;
+	
+	// post parsed data from the ircd
+	nstring::str modes;
+	nstring::str restrictModes;
+	nstring::str statusModes;
+	nstring::str modesWithParams;
+	nstring::str modesWithUParams;
+	std::map<char, char> prefixModes;
+	bool owner;
+	bool protect;
+	bool halfop;
 	
 	// some variables that tell the state of the link, ie during burst, finished burst. etc
 	bool finishedBurst;
@@ -70,6 +86,9 @@ public:
 	void addServer(nstring::str&, nstring::str&);
 	// remove server
 	void remServer(nstring::str&);
+
+	// parse modes from capab
+	void parseModes(nstring::str&);
 };
 
 // macro to initialize an ircd protocol

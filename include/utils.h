@@ -44,7 +44,7 @@ namespace utils
     // explode
     template<typename T> void explode(const char* delim, T &str, std::vector<T> &tokens);
     // replace
-    void replace(nstring::str &s, nstring::str f, nstring::str r);
+    template<typename T> void replace(T &s, T f, T r);
 	// getDataAfter
 	template<typename T> nstring::str getDataAfter(const T &data, unsigned int where);
 	// stripColon
@@ -207,7 +207,8 @@ void utils::explode(const char* delim, T &str, std::vector<T> &tokens)
 
  recursive str replace
 */
-inline void utils::replace(nstring::str &s, nstring::str f, nstring::str r)
+template<typename T>
+void utils::replace(T &s, T f, T r)
 {
     int find = 0;
     std::size_t rpos = 0;

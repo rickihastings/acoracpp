@@ -35,5 +35,19 @@ public:
 
 typedef short ErrorCode;
 
+/**
+ irc
+
+ our irc typedefs namespace
+*/
+namespace irc
+{
+    /**
+     mode containers
+     */
+    typedef std::map<nstring::str, nstring::str> modes;
+    typedef std::map<nstring::str, std::map<nstring::str, nstring::str> > params;
+}
+
 #endif // BASE_H
 

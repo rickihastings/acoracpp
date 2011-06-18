@@ -112,6 +112,8 @@ class IRCdCommandCapab : public IRCdCommand
 			if (!std::binary_search(params.begin(), params.end(), "SERVICES"))
 				instance->finalize("(ircd_charybdis) Required capability SERVICES not found.");
 			// search CAPAB to see if they support SERVICES, if not bail!
+			charybdis::ircd->parseModes(charybdis::ircd->capabModes);
+			// parse modes
 		}
 };
 
@@ -247,6 +249,12 @@ charybdisProtocol::charybdisProtocol(void* h)
 	charybdis::ircd = this;
 	// inspircd requires numeric to be specified
 	requireNumeric = true;
+	// max params (4 in charybdis i think it is) ?
+	maxParams = 4;
+	capabModes = "eIb,k,flj,CFPcgimnpstz";
+	prefixData = "(ov)@+";
+	defaultChanModes = "+nt";
+	owner = protect = halfop = false;
 
 	// read our numeric
 	instance->configReader->getValue(sid, "servicesserver", "numeric");

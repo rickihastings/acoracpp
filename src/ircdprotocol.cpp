@@ -161,3 +161,61 @@ void IRCdProtocol::remServer(nstring::str &sid)
 	//instance->log(LOGCHAN, "// TODO");
 	// log things, ie LOGCHAN and NETWORK
 }
+
+/**
+ IRCdProtocol::parseModes
+
+ function to parse modes from a format like 'eIb,k,flj,CFPcgimnpstz'
+*/
+void IRCdProtocol::parseModes(nstring::str &m)
+{
+	std::vector<nstring::str> parts, parsedPrefix;
+	nstring::str modeString, prefixModesS, prefixModesA;
+	modeString = m;
+	utils::explode(",", modeString, parts);
+	
+	restrictModes = parts.at(0);
+	modesWithUParams = parts.at(2);
+	
+	if (restrictModes.find("q") != std::string::npos)
+	{
+		owner = true;
+		statusModes += "q";
+		utils::replace(restrictModes, nstring::str("q"), nstring::str(""));
+		// remove from restrictModes and add to statusModes in order
+	}
+	
+	if (restrictModes.find("a") != std::string::npos)
+	{
+		owner = true;
+		statusModes += "a";
+		utils::replace(restrictModes, nstring::str("a"), nstring::str(""));
+		// remove from restrictModes and add to statusModes in order
+	}
+	// search restrict modes for 'aq' as we want them in status modes
+	
+	prefixModesS = prefixData;
+	utils::explode(")", prefixModesS, parsedPrefix);
+	prefixModesS = parsedPrefix.at(0).substr(1);
+	prefixModesA = parsedPrefix.at(1);
+	statusModes += prefixModesS;
+	// parse (ov)@+, we only really want "ov" right now
+	
+	modesWithParams = statusModes + restrictModes + parts.at(1) + modesWithUParams;
+	modes = modesWithParams + parts.at(3);
+	// compile our mode strings.
+	
+	if (prefixModesA.find("q") != std::string::npos)
+		prefixModes.insert(std::pair<char, char>('q', '@'));
+	if (prefixModesA.find("a") != std::string::npos)
+		prefixModes.insert(std::pair<char, char>('a', '@'));
+	// we assume that qa = @ when we aint told any better
+	
+	int part = 0;
+	for (nstring::str::iterator is = prefixModesS.begin(); is != prefixModesS.end(); ++is)
+	{
+		prefixModes.insert(std::pair<char, char>(prefixModesS.at(part), prefixModesA.at(part)));
+		part++;
+	}
+	// parse (ov)@+ into a map. ie o = @, v = +	etc
+}
