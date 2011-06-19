@@ -19,6 +19,7 @@
 
 #include <sstream>
 #include <vector>
+#include <algorithm>
 
 /**
  helper
@@ -49,6 +50,10 @@ namespace utils
 	template<typename T> nstring::str getDataAfter(const T &data, unsigned int where);
 	// stripColon
 	template<typename T> void stripColon(T &data);
+	// isNotAlnum
+	bool isNotAlnum(char);
+	// stringIsAlphaNumerical
+	template<typename T> bool stringIsAlphaNumerical(const T &str);
 }
 
 /**
@@ -262,6 +267,27 @@ void utils::stripColon(T &data)
 {
 	if (*(data.begin()) == ':')
 		data.erase(data.begin());
+}
+
+/**
+ utils::isNotAlnum
+
+ the reverse of isalnum basically
+*/
+bool utils::isNotAlnum(char c)
+{
+    return !(isalnum(c));
+}
+
+/**
+ utils::stringIsValid
+
+ check if string is valid (alphanumerical)
+*/
+template<typename T>
+bool utils::stringIsAlphaNumerical(const T &str)
+{
+    return std::count_if(str.begin(), str.end(), isalnum) == (signed)str.size();
 }
 
 #endif // UTILS_H

@@ -22,7 +22,6 @@
 #include "channelmanager.h"
 #include "modeparser.h"
 
-#include <iostream>
 #include <algorithm>
 
 // IRCD COMMANDS
@@ -247,15 +246,15 @@ class IRCdCommandSJoin : public IRCdCommand
 		
 		void execute(nstring::str&, nstring::str &paramStr, std::vector<nstring::str> &params)
 		{
-			std::vector<nstring::str> split, pSplit;
+			std::vector<nstring::str> split, pSplit, users;
 			utils::explode(":", paramStr, split);
 			utils::explode(" ", split.at(0), pSplit);
+			utils::explode(" ", split.at(1), users);
 			pSplit.erase(pSplit.begin(), pSplit.begin()+2);
 			nstring::str modes = utils::getDataAfter(pSplit, 0);
 			// explode via : to seperate modes etc from users
 			
-			//std::cout << modes.c_str() << " " << split.at(1).c_str() << std::endl;
-			//instance->channelManager(params.at(1), params.at(0), );
+			instance->channelManager->handleCreate(params.at(1), params.at(0), modes, users);
 			// send data to channel manager
 		}
 };

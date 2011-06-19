@@ -17,8 +17,6 @@
 #include "server.h"
 #include "utils.h"
 
-#include <iostream>
-
 /**
  IRCdProtocol::IRCdProtocol
 
@@ -214,8 +212,8 @@ void IRCdProtocol::parseModes(nstring::str &m)
 	int part = 0;
 	for (nstring::str::iterator is = prefixModesS.begin(); is != prefixModesS.end(); ++is)
 	{
-		prefixModes.insert(std::pair<char, char>(prefixModesS.at(part), prefixModesA.at(part)));
+		prefixModes.insert(std::pair<char, char>(prefixModesA.at(part), prefixModesS.at(part)));
 		part++;
 	}
-	// parse (ov)@+ into a map. ie o = @, v = +	etc
+	// parse (ov)@+ into a map. ie @ = o, + = v	etc
 }

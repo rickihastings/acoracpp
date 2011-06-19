@@ -15,7 +15,6 @@
 #include "utils.h"
 
 #include <algorithm>
-#include <iostream>
 
 /**
  UserManager::UserManager

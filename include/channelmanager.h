@@ -30,8 +30,11 @@ public:
 	// destructor
 	virtual ~ChannelManager();
 	
-	// handle chan create
+	// parse user string
+	std::map<nstring::str, nstring::str> parseUsers(std::vector<nstring::str>&);
 	
+	// handle chan create
+	void handleCreate(nstring::str&, nstring::str&, nstring::str&, std::vector<nstring::str>&);
 	// handle join
 	
 	// handle part
