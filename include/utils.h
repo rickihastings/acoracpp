@@ -51,7 +51,7 @@ namespace utils
 	// stripColon
 	template<typename T> void stripColon(T &data);
 	// isNotAlnum
-	bool isNotAlnum(char);
+	template<typename T> bool isNotAlnum(T);
 	// stringIsAlphaNumerical
 	template<typename T> bool stringIsAlphaNumerical(const T &str);
 }
@@ -274,7 +274,8 @@ void utils::stripColon(T &data)
 
  the reverse of isalnum basically
 */
-bool utils::isNotAlnum(char c)
+template<typename T> 
+bool utils::isNotAlnum(T c)
 {
     return !(isalnum(c));
 }

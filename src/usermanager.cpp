@@ -172,6 +172,10 @@ void UserManager::handleOper(nstring::str &uid, bool mode)
 	User* userHolder = getUserFromId(uid);
 	userHolder->oper = mode;
 	// set oper to mode
+	
+	//instance->log(NETWORK, "handleConnect(): " + nick + "!" + ident + "@" + host + " has connected to " + sid);
+	//instance->log(LOGCHAN, "// TODO");
+	// log things, ie LOGCHAN and NETWORK
 }
 
 /**

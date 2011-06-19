@@ -252,6 +252,7 @@ class IRCdCommandSJoin : public IRCdCommand
 			utils::explode(" ", split.at(1), users);
 			pSplit.erase(pSplit.begin(), pSplit.begin()+2);
 			nstring::str modes = utils::getDataAfter(pSplit, 0);
+			modes = modes.substr(1);
 			// explode via : to seperate modes etc from users
 			
 			instance->channelManager->handleCreate(params.at(1), params.at(0), modes, users);

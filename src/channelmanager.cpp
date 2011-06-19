@@ -13,16 +13,32 @@
 #include "instance.h"
 #include "ircdprotocol.h"
 #include "utils.h"
+#include "modeparser.h"
 #include "channelmanager.h"
 #include "usermanager.h"
 
 #include <iostream>
 
+/**
+ ChannelManager::ChannelManager
+
+ constructor
+*/
 ChannelManager::ChannelManager()
 { }
 
+/**
+ ChannelManager::~ChannelManager
+
+ destructor
+*/
 ChannelManager::~ChannelManager()
-{ }
+{
+	std::map<nstring::str, Channel*>::iterator i;
+	for (i = chans.begin(); i != chans.end(); ++i)
+		delete i->second;
+	chans.clear();
+}
 
 /**
  ChannelManager::parseUsers
@@ -57,7 +73,7 @@ std::map<nstring::str, nstring::str> ChannelManager::parseUsers(std::vector<nstr
 		if ((*it).find(",") == std::string::npos)
 		{
 			tempNick = tempModes = (*it);
-			tempNick.erase(std::remove_if(tempNick.begin(), tempNick.end(), utils::isNotAlnum), tempNick.end());
+			tempNick.erase(std::remove_if(tempNick.begin(), tempNick.end(), utils::isNotAlnum<char>), tempNick.end());
 			instance->userManager->getNickFromId(tempNick, tempNick);
 			// get the nick
 			
@@ -104,5 +120,36 @@ std::map<nstring::str, nstring::str> ChannelManager::parseUsers(std::vector<nstr
 */
 void ChannelManager::handleCreate(nstring::str &chan, nstring::str &ts, nstring::str &modes, std::vector<nstring::str> &users)
 {
-	//std::map<nstring::str, nstring::str> parsedUsers = parseUsers(users);
+	Channel* channel = NULL;
+	std::map<nstring::str, Channel*>::iterator it;
+	std::map<nstring::str, nstring::str> parsedUsers = parseUsers(users);
+	// parse up users
+	
+	std::time_t timeStamp;
+	std::istringstream stream(ts.c_str());
+	stream >> timeStamp;
+	// get the channel timestamp
+	
+	nstring::str uchan = chan;
+	std::transform(uchan.begin(), uchan.end(), uchan.begin(), ::tolower);
+	it = chans.find(chan);
+	// ::tolower chan
+	
+	if (it == chans.end())
+	{
+		channel = new Channel(chan, timeStamp);
+		chans.insert(std::pair<nstring::str, Channel*>(uchan, channel));
+		
+		instance->log(NETWORK, "handleCreate(): " + chan + " introduced to the network with a timestamp of " + ts);
+		// log things, ie NETWORK
+	}
+	// create a new channel.
+	
+	irc::modes modeContainer;
+	irc::params paramContainer;
+	instance->modeParser->sortModes(modes, modeContainer, paramContainer, true);
+	instance->modeParser->saveModes(channel, modeContainer, paramContainer);
+	// parse modes and save modes..
+	channel->users.insert(parsedUsers.begin(), parsedUsers.end());
+	// set some vars in our Channel*
 }

@@ -14,8 +14,7 @@
 #define	CHANNELMANAGER_H
 
 #include "base.h"
-
-class Channel;
+#include "channel.h"
 
 // manages channels on the network
 class ChannelManager
