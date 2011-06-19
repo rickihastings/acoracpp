@@ -239,7 +239,7 @@ ErrorCode ModuleManager::unloadDiskManager()
 
 ErrorCode ModuleManager::loadModule(nstring::str &name)
 {
-	if (name.find(".so") != nstring::str::npos)
+	if (name.find(".so") != std::string::npos)
 	{
 		for (short i = 0; i < 3; ++i)
 			name.erase(name.end() - 1);

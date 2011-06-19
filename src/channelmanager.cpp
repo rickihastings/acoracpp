@@ -9,8 +9,6 @@
 //      Please see the file COPYING for details.     //
 //                                                   //
 //===================================================//
-// $Id: channelmanager.cpp 706 2009-01-31 20:17:11Z ankit $
-//===================================================//
 
 #include "channelmanager.h"
 
@@ -19,4 +17,3 @@ ChannelManager::ChannelManager()
 
 ChannelManager::~ChannelManager()
 { }
-

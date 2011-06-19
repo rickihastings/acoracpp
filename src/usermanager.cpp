@@ -164,13 +164,15 @@ void UserManager::handleHost(nstring::str &uid, nstring::str &host)
 }
 
 /**
- UserManager::handleOperUp
+ UserManager::handleOper
 
- handle oper ups
+ handle oper ups (mode = true/false)
 */
-void UserManager::handleOperUp(nstring::str &uid)
+void UserManager::handleOper(nstring::str &uid, bool mode)
 {
-	
+	User* userHolder = getUserFromId(uid);
+	userHolder->oper = mode;
+	// set oper to mode
 }
 
 /**

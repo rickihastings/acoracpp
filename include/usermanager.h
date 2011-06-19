@@ -9,8 +9,6 @@
 //      Please see the file COPYING for details.     //
 //                                                   //
 //===================================================//
-// $Id: usermanager.h 706 2009-01-31 20:17:11Z ankit $
-//===================================================//
 
 #ifndef	USERMANAGER_H
 #define	USERMANAGER_H
@@ -43,8 +41,8 @@ public:
 	void handleMode(nstring::str&, nstring::str&);
 	// handle host
 	void handleHost(nstring::str&, nstring::str&);
-	// handle oper up
-	void handleOperUp(nstring::str&);
+	// handle oper
+	void handleOper(nstring::str&, bool);
 	
 	// get nickname from id
 	void getNickFromId(nstring::str&, nstring::str&);

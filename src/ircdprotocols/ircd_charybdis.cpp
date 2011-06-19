@@ -9,8 +9,6 @@
 //      Please see the file COPYING for details.     //
 //                                                   //
 //===================================================//
-// $Id: ircd_charybdis.cpp 707 2009-01-31 21:52:15Z ankit $
-//===================================================//
 
 #include "ircd_charybdis.h"
 
@@ -214,12 +212,17 @@ class IRCdCommandUMode : public IRCdCommand
 			instance->userManager->handleMode(params.at(0), modes);
 			// we send the new modes into handleMode, which is parsed by mode class.
 			
-			/*irc::modes modeContainer;
+			irc::modes modeContainer;
 			irc::params paramContainer;
-			instance->modeParser->sortModes(modes, modeContainer, paramContainer);
-			// here we also parse +o into handleOperUp
+			instance->modeParser->sortModes(modes, modeContainer, paramContainer, false);
+			// parse modes and send them into the user manager // TODO
 			
-			std::cout << modeContainer["plus"].c_str() << std::endl;*/
+			if (modeContainer["plus"].find('o') != std::string::npos)
+				instance->userManager->handleOper(params.at(0), true);
+			// check if we have an "+o", if we do call handleOper()
+			if (modeContainer["minus"].find('o') != std::string::npos)
+				instance->userManager->handleOper(params.at(0), false);
+			// check if we have a "-o", if we do again call handleOper()
 		}
 };
 
@@ -233,6 +236,27 @@ class IRCdCommandCHGHost : public IRCdCommand
 		{
 			instance->userManager->handleHost(params.at(0), params.at(1));
 			// we send the uid. into handleQuit
+		}
+};
+
+// :<uid> SJOIN <timestamp> <chan> <modes params> :<users>
+class IRCdCommandSJoin : public IRCdCommand
+{
+	public:
+		IRCdCommandSJoin() : IRCdCommand("SJOIN") { }
+		
+		void execute(nstring::str&, nstring::str &paramStr, std::vector<nstring::str> &params)
+		{
+			std::vector<nstring::str> split, pSplit;
+			utils::explode(":", paramStr, split);
+			utils::explode(" ", split.at(0), pSplit);
+			pSplit.erase(pSplit.begin(), pSplit.begin()+2);
+			nstring::str modes = utils::getDataAfter(pSplit, 0);
+			// explode via : to seperate modes etc from users
+			
+			//std::cout << modes.c_str() << " " << split.at(1).c_str() << std::endl;
+			//instance->channelManager(params.at(1), params.at(0), );
+			// send data to channel manager
 		}
 };
 
@@ -292,6 +316,7 @@ charybdisProtocol::charybdisProtocol(void* h)
 	addCommand(new IRCdCommandNick);
 	addCommand(new IRCdCommandUMode);
 	addCommand(new IRCdCommandCHGHost);
+	addCommand(new IRCdCommandSJoin);
 	addCommand(new IRCdCommandPing);
 }
 

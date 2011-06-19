@@ -9,22 +9,45 @@
 //      Please see the file COPYING for details.     //
 //                                                   //
 //===================================================//
-// $Id: channelmanager.h 706 2009-01-31 20:17:11Z ankit $
-//===================================================//
 
 #ifndef	CHANNELMANAGER_H
 #define	CHANNELMANAGER_H
 
 #include "base.h"
 
+class Channel;
+
 // manages channels on the network
 class ChannelManager
 {
+	// internal channel map
+	std::map<nstring::str, Channel*> chans;
+
 public:
+
 	// constructor
 	ChannelManager();
 	// destructor
 	virtual ~ChannelManager();
+	
+	// handle chan create
+	
+	// handle join
+	
+	// handle part
+	
+	// handle quit
+	
+	// handle nick changes (believe it or not)
+	
+	// handle mode
+	
+	// handle topic/ftopic
+	
+	// handle tb (TS6)
+	
+	// handle bmask (TS6)
+	
 };
 
 #endif // CHANNELMANAGER_H
