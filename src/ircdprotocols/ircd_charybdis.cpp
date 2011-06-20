@@ -303,21 +303,21 @@ charybdisProtocol::charybdisProtocol(void* h)
 	owner = protect = halfop = false;
 
 	// read our numeric
-	instance->configReader->getValue(sid, "servicesserver", "numeric");
+	instance->configReader->getValue(sid, "server", "numeric");
 	
 	// if no sid is mentioned, don't load
 	if (sid.empty())
-		throw Exception("ircd_charybdis", "ServicesServer::numeric is not specified.");
+		throw Exception("ircd_charybdis", "server::numeric is not specified.");
 
 	else if (	sid.length() != 3 || !(sid[0] >= '0' && sid[0] <= '9')
 			|| !((sid[1] >= 'A' && sid[1] <= 'Z') || (sid[1] >= '0' && sid[1] <= '9'))
 			|| !((sid[2] >= 'A' && sid[2] <= 'Z') || (sid[2] >= '0' && sid[2] <= '9'))
 	)
-		throw Exception("ircd_charybdis", "ServicesServer::numeric must be in the format [0-9][A-Z0-9][A-Z0-9].");
+		throw Exception("ircd_charybdis", "server::numeric must be in the format [0-9][A-Z0-9][A-Z0-9].");
 	// throw an exception if the numeric isnt correct.
 	
 	// read our name
-	instance->configReader->getValue(name, "servicesserver", "name");
+	instance->configReader->getValue(name, "server", "name");
 	
 	addServer(name, sid);
 	// add our server.
@@ -356,5 +356,5 @@ void charybdisProtocol::initServer()
 	// CAPAB :<supported capab>
 	instance->socketEngine->sendString("CAPAB :QS EX CHW IE KLN KNOCK TB UNKLN CLUSTER ENCAP SERVICES RSFNC SAVE EUID EOPMOD BAN MLOCK");
 	// SERVER <servername> <hopcount> :<description>
-	instance->socketEngine->sendString("SERVER " + instance->configReader->getValue<nstring::str>("servicesserver", "name", nstring::str()) + " 0 :" + instance->configReader->getValue<nstring::str>("servicesserver", "desc", nstring::str()));
+	instance->socketEngine->sendString("SERVER " + instance->configReader->getValue<nstring::str>("server", "name", nstring::str()) + " 0 :" + instance->configReader->getValue<nstring::str>("server", "desc", nstring::str()));
 }

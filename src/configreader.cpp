@@ -9,8 +9,6 @@
 //      Please see the file COPYING for details.     //
 //                                                   //
 //===================================================//
-// $Id: configreader.cpp 692 2009-01-29 09:15:03Z ankit $
-//===================================================//
 
 #include "configreader.h"
 #include "config.h"
@@ -162,9 +160,9 @@ ErrorCode ConfigReader::read(const nstring::str &file, std::deque<nstring::str> 
 					if (block.empty() && *i == ' ')
 						continue;
 						
-					if (*i == ')')
+					if (*i == '}')
 					{
-						reader::addError(file, errors, lno, "No block to end. (Unexpected ')')");
+						reader::addError(file, errors, lno, "No block to end. (Unexpected '}')");
 						return err::configreader::errors;
 					}
 					else if (*i == '"')
@@ -173,9 +171,9 @@ ErrorCode ConfigReader::read(const nstring::str &file, std::deque<nstring::str> 
 						return err::configreader::errors;
 					}
 					
-					if (!glock && *i != ' ' && *i != '(')
+					if (!glock && *i != ' ' && *i != '{')
 						block += charmaps::lower[static_cast<short>(*i)];
-					else if (glock && *i != ' ' && *i != '(')
+					else if (glock && *i != ' ' && *i != '{')
 					{
 						reader::addError(file, errors, lno, nstring::str() + "Missing block after \"" + block.c_str() + "\"");
 						return err::configreader::errors;
@@ -183,7 +181,7 @@ ErrorCode ConfigReader::read(const nstring::str &file, std::deque<nstring::str> 
 					else
 						glock = true;
 						
-					if (*i == '(')
+					if (*i == '{')
 					{
 						if (block.empty())
 						{
@@ -205,7 +203,7 @@ ErrorCode ConfigReader::read(const nstring::str &file, std::deque<nstring::str> 
 					if (key.empty() && *i == ' ')
 						continue;
 
-					if (*i == ')')
+					if (*i == '}')
 					{
 						if (key.empty())
 						{
@@ -219,9 +217,9 @@ ErrorCode ConfigReader::read(const nstring::str &file, std::deque<nstring::str> 
 							return err::configreader::errors;
 						}
 					}
-					else if (*i == '(')
+					else if (*i == '{')
 					{
-						reader::addError(file, errors, lno, "'(' is not allowed inside a block");
+						reader::addError(file, errors, lno, "'{' is not allowed inside a block");
 						return err::configreader::errors;
 					}
 
@@ -338,25 +336,25 @@ ErrorCode ConfigReader::read(const nstring::str file, std::deque<nstring::str> &
 		std::size_t size = errors.size();
 		
 		if (isEmpty("modules", "socketengine", &vals))
-			errors.push_back("Missing required value: Modules::socketengine");
+			errors.push_back("Missing required value: modules::socketengine");
 		if (isEmpty("modules", "ircdprotocol", &vals))
-			errors.push_back("Missing required value: Modules::ircdprotocol");
+			errors.push_back("Missing required value: modules::ircdprotocol");
 
 		if (isEmpty("remoteserver", "address", &vals))
-			errors.push_back("Missing required value: RemoteServer::address");
+			errors.push_back("Missing required value: remoteserver::address");
 		if (isEmpty("remoteserver", "port", &vals))
-			errors.push_back("Missing required value: RemoteServer::port");
+			errors.push_back("Missing required value: remoteserver::port");
 		if (isEmpty("remoteserver", "password", &vals))
-			errors.push_back("Missing required value: RemoteServer::password");
+			errors.push_back("Missing required value: remoteserver::password");
 
-		if (isEmpty("servicesserver", "name", &vals))
-			errors.push_back("Missing required value: ServicesServer::name");
-		if (isEmpty("servicesserver", "desc", &vals))
-			errors.push_back("Missing required value: ServicesServer::desc");
-		if (isEmpty("servicesserver", "network", &vals))
-			errors.push_back("Missing required value: ServicesServer::network");
-		if (instance->ircdProtocol && instance->ircdProtocol->requireNumeric && isEmpty("servicesserver", "numeric", &vals))
-			errors.push_back("Missing required value: ServicesServer::numeric");
+		if (isEmpty("server", "name", &vals))
+			errors.push_back("Missing required value: server::name");
+		if (isEmpty("server", "desc", &vals))
+			errors.push_back("Missing required value: server::desc");
+		if (isEmpty("server", "network", &vals))
+			errors.push_back("Missing required value: server::network");
+		if (instance->ircdProtocol && instance->ircdProtocol->requireNumeric && isEmpty("server", "numeric", &vals))
+			errors.push_back("Missing required value: server::numeric");
 		
 		if (size != errors.size())
 			return err::configreader::errors;
