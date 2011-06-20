@@ -136,16 +136,21 @@ void UserManager::handleNick(nstring::str &uid, nstring::str &nick)
 
  handle mode changes
 */
-void UserManager::handleMode(nstring::str &uid, irc::modes &modes)
+void UserManager::handleMode(nstring::str &uid, nstring::str &modes)
 {
+	irc::modes modeContainer;
+	irc::params paramContainer;
+	instance->modeParser->sortModes(modes, modeContainer, paramContainer, false);
+	// parse modes
+
 	User* user = getUserFromId(uid);
-	instance->modeParser->saveModes(user, modes);
+	instance->modeParser->saveModes(user, modeContainer);
 	// update the modes in our user record
 
-	if (modes["plus"].find('o') != std::string::npos)
+	if (modeContainer["plus"].find('o') != std::string::npos)
 		handleOper(uid, true);
 	// check if we have an "+o", if we do call handleOper()
-	if (modes["minus"].find('o') != std::string::npos)
+	if (modeContainer["minus"].find('o') != std::string::npos)
 		handleOper(uid, false);
 	// check if we have a "-o", if we do again call handleOper()
 	

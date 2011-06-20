@@ -20,7 +20,6 @@
 #include "exception.h"
 #include "usermanager.h"
 #include "channelmanager.h"
-#include "modeparser.h"
 
 #include <algorithm>
 
@@ -210,10 +209,7 @@ class IRCdCommandUMode : public IRCdCommand
 			utils::stripColon(modes);
 			// we send the new modes into handleMode, which is parsed by mode class.
 			
-			irc::modes modeContainer;
-			irc::params paramContainer;
-			instance->modeParser->sortModes(modes, modeContainer, paramContainer, false);
-			instance->userManager->handleMode(params.at(0), modeContainer);
+			instance->userManager->handleMode(params.at(0), modes);
 			// parse modes and send them into the user manager
 		}
 };
@@ -279,6 +275,20 @@ class IRCdCommandPart : public IRCdCommand
 		}
 };
 
+// :<uid> TMODE <timestamp> <chan> <modes>
+class IRCdCommandTMode : public IRCdCommand
+{
+	public:
+		IRCdCommandTMode() : IRCdCommand("TMODE") { }
+		
+		void execute(nstring::str &src, nstring::str &paramStr, std::vector<nstring::str> &params)
+		{
+			nstring::str modes = utils::getDataAfter(params, 2);
+			instance->channelManager->handleMode(src, params.at(1), modes);
+			// send data to channel manager
+		}
+};
+
 // SERVER METHODS
 
 charybdisServer::charybdisServer() { }
@@ -338,6 +348,7 @@ charybdisProtocol::charybdisProtocol(void* h)
 	addCommand(new IRCdCommandSJoin);
 	addCommand(new IRCdCommandJoin);
 	addCommand(new IRCdCommandPart);
+	addCommand(new IRCdCommandTMode);
 	addCommand(new IRCdCommandPing);
 }
 

@@ -43,7 +43,7 @@ public:
 	// handle quit
 	
 	// handle nick changes (believe it or not)
-	
+	void handleMode(nstring::str&, nstring::str&, nstring::str&);
 	// handle mode
 	
 	// handle topic/ftopic

@@ -241,3 +241,19 @@ void ChannelManager::handlePart(nstring::str &uid, nstring::str &chan)
 	// log things, ie NETWORK
 }
 
+/**
+ ChannelManager::handleMode
+
+ handle TMODE changes, etc.
+*/
+void ChannelManager::handleMode(nstring::str &uid, nstring::str &chan, nstring::str &modes)
+{
+	irc::modes modeContainer;
+	irc::params paramContainer;
+	instance->modeParser->sortModes(modes, modeContainer, paramContainer, true);
+	// parse modes
+
+	Channel* channel = getChannel(chan);
+	instance->modeParser->saveModes(channel, modeContainer, paramContainer);
+	// update the modes in our channel record
+}
