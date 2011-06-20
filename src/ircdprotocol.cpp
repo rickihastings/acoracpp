@@ -161,6 +161,25 @@ void IRCdProtocol::remServer(nstring::str &sid)
 }
 
 /**
+ IRCdProtocol::getServerFromId
+
+ function to get servers from ids
+*/
+nstring::str IRCdProtocol::getServerFromId(nstring::str &sid)
+{
+	nstring::str name = "";
+	std::map<nstring::str, Server*>::iterator it = servers.find(sid);
+	
+	if (it != servers.end())
+		name = it->second->name;
+	else
+		instance->log(ERROR, "getServerFromId(): cannot find server in internal server array from id.");
+	// set name as name from server class
+	
+	return name;
+}
+
+/**
  IRCdProtocol::parseModes
 
  function to parse modes from a format like 'eIb,k,flj,CFPcgimnpstz'

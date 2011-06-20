@@ -208,20 +208,13 @@ class IRCdCommandUMode : public IRCdCommand
 		{
 			nstring::str modes = params.at(1);
 			utils::stripColon(modes);
-			instance->userManager->handleMode(params.at(0), modes);
 			// we send the new modes into handleMode, which is parsed by mode class.
 			
 			irc::modes modeContainer;
 			irc::params paramContainer;
 			instance->modeParser->sortModes(modes, modeContainer, paramContainer, false);
-			// parse modes and send them into the user manager // TODO
-			
-			if (modeContainer["plus"].find('o') != std::string::npos)
-				instance->userManager->handleOper(params.at(0), true);
-			// check if we have an "+o", if we do call handleOper()
-			if (modeContainer["minus"].find('o') != std::string::npos)
-				instance->userManager->handleOper(params.at(0), false);
-			// check if we have a "-o", if we do again call handleOper()
+			instance->userManager->handleMode(params.at(0), modeContainer);
+			// parse modes and send them into the user manager
 		}
 };
 
@@ -256,6 +249,32 @@ class IRCdCommandSJoin : public IRCdCommand
 			// explode via : to seperate modes etc from users
 			
 			instance->channelManager->handleCreate(params.at(1), params.at(0), modes, users);
+			// send data to channel manager
+		}
+};
+
+// :<uid> JOIN <timestamp> <chan> +
+class IRCdCommandJoin : public IRCdCommand
+{
+	public:
+		IRCdCommandJoin() : IRCdCommand("JOIN") { }
+		
+		void execute(nstring::str &src, nstring::str &paramStr, std::vector<nstring::str> &params)
+		{
+			instance->channelManager->handleJoin(src, params.at(0), params.at(1));
+			// send data to channel manager
+		}
+};
+
+// :<uid> PART <chan>
+class IRCdCommandPart : public IRCdCommand
+{
+	public:
+		IRCdCommandPart() : IRCdCommand("PART") { }
+		
+		void execute(nstring::str &src, nstring::str &paramStr, std::vector<nstring::str> &params)
+		{
+			instance->channelManager->handlePart(src, params.at(0));
 			// send data to channel manager
 		}
 };
@@ -317,6 +336,8 @@ charybdisProtocol::charybdisProtocol(void* h)
 	addCommand(new IRCdCommandUMode);
 	addCommand(new IRCdCommandCHGHost);
 	addCommand(new IRCdCommandSJoin);
+	addCommand(new IRCdCommandJoin);
+	addCommand(new IRCdCommandPart);
 	addCommand(new IRCdCommandPing);
 }
 

@@ -114,6 +114,30 @@ std::map<nstring::str, nstring::str> ChannelManager::parseUsers(std::vector<nstr
 }
 
 /**
+ ChannelManager::getChannel
+
+ return channel from name
+*/
+Channel* ChannelManager::getChannel(nstring::str &chan)
+{
+	nstring::str uchan = chan;
+	std::transform(uchan.begin(), uchan.end(), uchan.begin(), ::tolower);
+	// to lower it, seen as though everything in chans is tolower.
+	
+	std::map<nstring::str, Channel*>::iterator it = chans.find(uchan);
+	if (it != chans.end())
+	{
+		return it->second;
+	}
+	else
+	{
+		instance->log(ERROR, "getChannel(): trying to find invalid channel, this can cause serious issues!");
+		return NULL;
+	}
+	// find the channel class from our channel map
+}
+
+/**
  ChannelManager::handleCreate
 
  handle SJOINS or FJOIN w/e
@@ -123,6 +147,7 @@ void ChannelManager::handleCreate(nstring::str &chan, nstring::str &ts, nstring:
 	Channel* channel = NULL;
 	std::map<nstring::str, Channel*>::iterator it;
 	std::map<nstring::str, nstring::str> parsedUsers = parseUsers(users);
+	std::map<nstring::str, nstring::str> oldUsers;
 	// parse up users
 	
 	std::time_t timeStamp;
@@ -139,9 +164,19 @@ void ChannelManager::handleCreate(nstring::str &chan, nstring::str &ts, nstring:
 	{
 		channel = new Channel(chan, timeStamp);
 		chans.insert(std::pair<nstring::str, Channel*>(uchan, channel));
+		channel->users.insert(parsedUsers.begin(), parsedUsers.end());
 		
 		instance->log(NETWORK, "handleCreate(): " + chan + " introduced to the network with a timestamp of " + ts);
 		// log things, ie NETWORK
+	}
+	else
+	{
+		oldUsers = channel->users;
+		channel->users.clear();
+		
+		parsedUsers.insert(oldUsers.begin(), oldUsers.end());
+		channel->users.insert(parsedUsers.begin(), parsedUsers.end());
+		// set some vars in our Channel*
 	}
 	// create a new channel.
 	
@@ -150,6 +185,59 @@ void ChannelManager::handleCreate(nstring::str &chan, nstring::str &ts, nstring:
 	instance->modeParser->sortModes(modes, modeContainer, paramContainer, true);
 	instance->modeParser->saveModes(channel, modeContainer, paramContainer);
 	// parse modes and save modes..
-	channel->users.insert(parsedUsers.begin(), parsedUsers.end());
-	// set some vars in our Channel*
 }
+
+/**
+ ChannelManager::handleJoin
+
+ handle JOINS
+*/
+void ChannelManager::handleJoin(nstring::str &uid, nstring::str &ts, nstring::str &chan)
+{
+	Channel* channel = getChannel(chan);
+	nstring::str nick;
+	instance->userManager->getNickFromId(uid, nick);
+	// get the nick & channel
+	
+	channel->users.insert(std::pair<nstring::str, nstring::str>(nick, ""));
+	
+	instance->log(NETWORK, "handleJoin(): " + nick + " has joined " + chan);
+	// log things, ie NETWORK
+}
+
+/**
+ ChannelManager::handlePart
+
+ handle PART
+*/
+void ChannelManager::handlePart(nstring::str &uid, nstring::str &chan)
+{
+	Channel* channel = getChannel(chan);
+	std::map<nstring::str, Channel*>::iterator i = chans.find(chan);
+	nstring::str nick;
+	instance->userManager->getNickFromId(uid, nick);
+	// get the nick & channel
+	
+	std::map<nstring::str, nstring::str>::iterator it = channel->users.find(nick);
+	if (it == channel->users.end())
+	{
+		instance->log(ERROR, "handlePart(): trying to find user in channel map on part, can't find user!");
+		return;
+	}
+	// can't find user in channel->users. major issue?
+	
+	channel->users.erase(it);
+	
+	if (channel->users.empty())
+	{
+		delete channel;
+		chans.erase(i);
+	}
+	// remove the user from our internal channel->users array, ALSO
+	// check if our internal array matches 0, if it does the channel
+	// is empty so delete it.
+	
+	instance->log(NETWORK, "handlePart(): " + nick + " has left " + chan);
+	// log things, ie NETWORK
+}
+

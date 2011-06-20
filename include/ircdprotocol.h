@@ -86,6 +86,8 @@ public:
 	void addServer(nstring::str&, nstring::str&);
 	// remove server
 	void remServer(nstring::str&);
+	// get server from id
+	nstring::str getServerFromId(nstring::str&);
 
 	// parse modes from capab
 	void parseModes(nstring::str&);

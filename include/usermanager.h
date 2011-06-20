@@ -38,7 +38,7 @@ public:
 	// handle nick
 	void handleNick(nstring::str&, nstring::str&);
 	// handle mode
-	void handleMode(nstring::str&, nstring::str&);
+	void handleMode(nstring::str&, irc::modes&);
 	// handle host
 	void handleHost(nstring::str&, nstring::str&);
 	// handle oper

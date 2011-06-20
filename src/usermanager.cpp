@@ -12,9 +12,11 @@
 
 #include "instance.h"
 #include "usermanager.h"
+#include "modeparser.h"
 #include "utils.h"
 
 #include <algorithm>
+#include <iostream>
 
 /**
  UserManager::UserManager
@@ -57,7 +59,7 @@ void UserManager::handleConnect(nstring::str &nick, nstring::str &ident, nstring
 	uidMap.insert(std::pair<nstring::str, nstring::str>(uid, unick));
 	// insert user into uid map so we can find it easily
 	
-	instance->log(NETWORK, "handleConnect(): " + nick + "!" + ident + "@" + host + " has connected to " + sid);
+	instance->log(NETWORK, "handleConnect(): " + nick + "!" + ident + "@" + host + " (" + uid + ") has connected to " + sid);
 	//instance->log(LOGCHAN, "// TODO");
 	// log things, ie LOGCHAN and NETWORK
 }
@@ -134,9 +136,20 @@ void UserManager::handleNick(nstring::str &uid, nstring::str &nick)
 
  handle mode changes
 */
-void UserManager::handleMode(nstring::str &uid, nstring::str &modes)
+void UserManager::handleMode(nstring::str &uid, irc::modes &modes)
 {
+	User* user = getUserFromId(uid);
+	instance->modeParser->saveModes(user, modes);
+	// update the modes in our user record
+
+	if (modes["plus"].find('o') != std::string::npos)
+		handleOper(uid, true);
+	// check if we have an "+o", if we do call handleOper()
+	if (modes["minus"].find('o') != std::string::npos)
+		handleOper(uid, false);
+	// check if we have a "-o", if we do again call handleOper()
 	
+	std::cout << user->modes.c_str();
 }
 
 /**
@@ -185,7 +198,7 @@ void UserManager::handleOper(nstring::str &uid, bool mode)
 */
 void UserManager::getNickFromId(nstring::str &uid, nstring::str &nick)
 {
-	std::map<nstring::str, nstring::str>::iterator it = uidMap.begin();
+	std::map<nstring::str, nstring::str>::iterator it = uidMap.find(uid);
 	
 	if (it != uidMap.end())
 		nick = it->second;

@@ -32,12 +32,14 @@ public:
 	// parse user string
 	std::map<nstring::str, nstring::str> parseUsers(std::vector<nstring::str>&);
 	
+	// get channel
+	Channel* getChannel(nstring::str&);
 	// handle chan create
 	void handleCreate(nstring::str&, nstring::str&, nstring::str&, std::vector<nstring::str>&);
 	// handle join
-	
+	void handleJoin(nstring::str&, nstring::str&, nstring::str&);
 	// handle part
-	
+	void handlePart(nstring::str&, nstring::str&);
 	// handle quit
 	
 	// handle nick changes (believe it or not)
