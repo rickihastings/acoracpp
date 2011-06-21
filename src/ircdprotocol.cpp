@@ -130,7 +130,7 @@ void IRCdProtocol::addServer(nstring::str &server, nstring::str &sid)
 {
 	servers.insert(std::pair<nstring::str, Server*>(sid, new Server(server, sid)));
 	
-	instance->log(NETWORK, "addServer(): " + server + " has connected to the network with the server id: " + sid);
+	instance->log(MISC, "addServer(): " + server + " has connected to the network with the server id: " + sid);
 	//instance->log(LOGCHAN, "// TODO");
 	// log things, ie LOGCHAN and NETWORK
 }
@@ -155,7 +155,7 @@ void IRCdProtocol::remServer(nstring::str &sid)
 	// find the server, and remove it.
 	servers.erase(it);
 	
-	instance->log(NETWORK, "remServer(): " + server + ":" + sid + " has disconnected from the network");
+	instance->log(MISC, "remServer(): " + server + ":" + sid + " has disconnected from the network");
 	//instance->log(LOGCHAN, "// TODO");
 	// log things, ie LOGCHAN and NETWORK
 }

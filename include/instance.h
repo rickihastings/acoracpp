@@ -9,8 +9,6 @@
 //      Please see the file COPYING for details.     //
 //                                                   //
 //===================================================//
-// $Id: instance.h 706 2009-01-31 20:17:11Z ankit $
-//===================================================//
 
 #ifndef	INSTANCE_H
 #define	INSTANCE_H
@@ -21,15 +19,15 @@
  debug variables
  */
 #define ALL 0
-#define INFO 1
-
-#define ERROR 2
-#define NETWORK 3
-#define COMMANDS 4
-#define ADMIN 5
-#define REGISTER 6
-#define RAWDATA 7
-#define LOGCHAN 8
+#define DEBUG 1
+#define MISC 2
+#define ERROR 3
+#define NETWORK 4
+#define COMMANDS 5
+#define ADMIN 6
+#define REGISTER 7
+#define SET 8
+#define RAWDATA 9
 
 /**
  max buffer - irc data
@@ -76,9 +74,7 @@ class Instance
 	// services keep running till this value is true
 	bool keepRunning;
 	// loglevel
-	std::map<int, nstring::str> logLevel;
-	// log level iterators
-	std::map<int, std::map<int, nstring::str>::iterator> iterators;
+	std::vector<int> logLevel;
 
 public:
 
@@ -121,6 +117,8 @@ public:
 	// run the iterations
 	ErrorCode run();
 	
+	// on rehash. a routine called when config files are read
+	void onRehash();
 	// log
 	void log(int type, const nstring::str &text, ...);
 	

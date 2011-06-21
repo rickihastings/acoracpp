@@ -9,8 +9,6 @@
 //      Please see the file COPYING for details.     //
 //                                                   //
 //===================================================//
-// $Id: sock_select.cpp 692 2009-01-29 09:15:03Z ankit $
-//===================================================//
 
 #include "socketengine.h"
 #include "instance.h"
@@ -78,11 +76,11 @@ public:
 	// connect to the remote server
 	ErrorCode connect()
 	{
-		instance->log(INFO, "SelectEngine(): Connecting to uplink...");
+		instance->log(NETWORK, "SelectEngine(): Connecting to uplink...");
 		
 		if (isConnected())
 		{
-			instance->log(INFO, "SelectEngine(): Already connected.");
+			instance->log(NETWORK, "SelectEngine(): Already connected.");
 			return err::socketengine::alreadyConnected;
 		}
 
@@ -162,7 +160,7 @@ public:
 		FD_SET(fd, &eset);
 
 		connected = true;
-		instance->log(INFO, "SelectEngine(): Connected to uplink.");
+		instance->log(NETWORK, "SelectEngine(): Connected to uplink.");
 
 		return err::socketengine::none;
 	}
@@ -247,7 +245,7 @@ public:
 		if (!isConnected())
 			return err::socketengine::notConnected;
 		
-		instance->log(INFO, "SelectEngine(): Disconnecting ...");
+		instance->log(NETWORK, "SelectEngine(): Disconnecting ...");
 		
 		if (shutdown(fd, SHUT_RDWR) == -1)
 		{
@@ -262,7 +260,7 @@ public:
 		}
 
 		connected = false;
-		instance->log(INFO, "SelectEngine(): Disconnected.");
+		instance->log(NETWORK, "SelectEngine(): Disconnected.");
 		
 		return err::socketengine::none;
 	}

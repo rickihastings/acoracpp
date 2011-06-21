@@ -59,7 +59,7 @@ ErrorCode ConfigReader::read(const nstring::str &file, std::deque<nstring::str> 
 	}
 	
 	filestack.push_back(file);
-	instance->log(INFO, "ConfigReader(): Reading config file \"" + file + "\" ...");
+	instance->log(DEBUG, "ConfigReader(): Reading config file \"" + file + "\" ...");
 	
 	std::ifstream fin((nstring::str(config::CONFDIR) + file).c_str());
 	if (!fin)
@@ -313,7 +313,7 @@ ErrorCode ConfigReader::read(const nstring::str &file, std::deque<nstring::str> 
 	}
 	
 	filestack.pop_back();
-	instance->log(INFO, "ConfigReader(): Finished reading config file \"" + file + "\".");
+	instance->log(DEBUG, "ConfigReader(): Finished reading config file \"" + file + "\".");
 	
 	if (errors.empty())
 		return err::configreader::none;
@@ -356,11 +356,20 @@ ErrorCode ConfigReader::read(const nstring::str file, std::deque<nstring::str> &
 		if (instance->ircdProtocol && instance->ircdProtocol->requireNumeric && isEmpty("server", "numeric", &vals))
 			errors.push_back("Missing required value: server::numeric");
 		
+		if (isEmpty("settings", "loglevel", &vals))
+			errors.push_back("Missing required value: settings::loglevel");
+		if (isEmpty("settings", "language", &vals))
+			errors.push_back("Missing required value: settings::language");
+		
 		if (size != errors.size())
 			return err::configreader::errors;
 	}
 
 	values = vals;
+	
+	// call on rehash routine
+	instance->onRehash();
+	
 	return ret;
 }
 

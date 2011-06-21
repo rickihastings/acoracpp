@@ -59,7 +59,7 @@ void UserManager::handleConnect(nstring::str &nick, nstring::str &ident, nstring
 	uidMap.insert(std::pair<nstring::str, nstring::str>(uid, unick));
 	// insert user into uid map so we can find it easily
 	
-	instance->log(NETWORK, "handleConnect(): " + nick + "!" + ident + "@" + host + " (" + uid + ") has connected to " + sid);
+	instance->log(MISC, "handleConnect(): " + nick + "!" + ident + "@" + host + " (" + uid + ") has connected to " + sid);
 	//instance->log(LOGCHAN, "// TODO");
 	// log things, ie LOGCHAN and NETWORK
 }
@@ -79,7 +79,7 @@ void UserManager::handleQuit(nstring::str &uid)
 	std::map<nstring::str, User*>::iterator it = users.find(nick);
 	if (i != uidMap.end() && it != users.end())
 	{
-		instance->log(NETWORK, "handleQuit(): " + it->second->nick + "!" + it->second->ident + "@" + it->second->host + " has disconnected from " + it->second->server);
+		instance->log(MISC, "handleQuit(): " + it->second->nick + "!" + it->second->ident + "@" + it->second->host + " has disconnected from " + it->second->server);
 		//instance->log(LOGCHAN, "// TODO");
 		// log things, ie LOGCHAN and NETWORK
 	
@@ -116,7 +116,7 @@ void UserManager::handleNick(nstring::str &uid, nstring::str &nick)
 	std::map<nstring::str, nstring::str>::iterator i = uidMap.find(uid);
 	// find uid maps
 	
-	instance->log(NETWORK, "handleNick(): " + it->second->nick + "!" + it->second->ident + "@" + it->second->host + " changed nick to " + nick);
+	instance->log(MISC, "handleNick(): " + it->second->nick + "!" + it->second->ident + "@" + it->second->host + " changed nick to " + nick);
 	//instance->log(LOGCHAN, "// TODO");
 	// log things, ie LOGCHAN and NETWORK
 	
@@ -171,7 +171,7 @@ void UserManager::handleHost(nstring::str &uid, nstring::str &host)
 	std::map<nstring::str, User*>::iterator it = users.find(userNick);
 	// find uid maps
 	
-	instance->log(NETWORK, "handleHost(): " + it->second->nick + "!" + it->second->ident + "@" + it->second->host + " changed hostname to " + host);
+	instance->log(MISC, "handleHost(): " + it->second->nick + "!" + it->second->ident + "@" + it->second->host + " changed hostname to " + host);
 	//instance->log(LOGCHAN, "// TODO");
 	// log things, ie LOGCHAN and NETWORK
 	
@@ -191,7 +191,7 @@ void UserManager::handleOper(nstring::str &uid, bool mode)
 	userHolder->oper = mode;
 	// set oper to mode
 	
-	//instance->log(NETWORK, "handleConnect(): " + nick + "!" + ident + "@" + host + " has connected to " + sid);
+	//instance->log(MISC, "handleConnect(): " + nick + "!" + ident + "@" + host + " has connected to " + sid);
 	//instance->log(LOGCHAN, "// TODO");
 	// log things, ie LOGCHAN and NETWORK
 }

@@ -166,7 +166,7 @@ void ChannelManager::handleCreate(nstring::str &chan, nstring::str &ts, nstring:
 		chans.insert(std::pair<nstring::str, Channel*>(uchan, channel));
 		channel->users.insert(parsedUsers.begin(), parsedUsers.end());
 		
-		instance->log(NETWORK, "handleCreate(): " + chan + " introduced to the network with a timestamp of " + ts);
+		instance->log(MISC, "handleCreate(): " + chan + " introduced to the network with a timestamp of " + ts);
 		// log things, ie NETWORK
 	}
 	else
@@ -201,7 +201,7 @@ void ChannelManager::handleJoin(nstring::str &uid, nstring::str &ts, nstring::st
 	
 	channel->users.insert(std::pair<nstring::str, nstring::str>(nick, ""));
 	
-	instance->log(NETWORK, "handleJoin(): " + nick + " has joined " + chan);
+	instance->log(MISC, "handleJoin(): " + nick + " has joined " + chan);
 	// log things, ie NETWORK
 }
 
@@ -237,7 +237,7 @@ void ChannelManager::handlePart(nstring::str &uid, nstring::str &chan)
 	// check if our internal array matches 0, if it does the channel
 	// is empty so delete it.
 	
-	instance->log(NETWORK, "handlePart(): " + nick + " has left " + chan);
+	instance->log(MISC, "handlePart(): " + nick + " has left " + chan);
 	// log things, ie NETWORK
 }
 

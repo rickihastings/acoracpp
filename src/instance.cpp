@@ -73,7 +73,7 @@ Instance::Instance(int &ac, char **av, const bool &d) :
 
 void Instance::cleanup()
 {
-	log(INFO, "Instance(): Cleaning up ...");
+	log(DEBUG, "Instance(): Cleaning up ...");
 
 	// deleting moduleManager deletes socketEngine, ircdProtocol,
 	// diskManager and loaded modules
@@ -83,7 +83,7 @@ void Instance::cleanup()
 	if (channelManager)	DELETE(channelManager);
 	if (modeParser)		DELETE(modeParser);
 	
-	log(INFO, "Instance(): Cleanup complete.");
+	log(DEBUG, "Instance(): Cleanup complete.");
 }
 
 #undef DELETE
@@ -92,7 +92,7 @@ void Instance::cleanup()
 Instance::~Instance()
 {
 	cleanup();
-	log(INFO, "Instance(): Shutting down ...");
+	log(DEBUG, "Instance(): Shutting down ...");
 }
 
 
@@ -209,12 +209,56 @@ ErrorCode Instance::run()
 			ircdProtocol->processBuffer(buffer);
 		else if (ret != err::socketengine::empty)
 		{
-			log(NETWORK, "Instance(): recv returned error: " + error);
+			log(ERROR, "Instance(): recv returned error: " + error);
 			break;
 		}
 	}
 
 	return err::exit::normal;
+}
+
+
+/**
+ Instance::onRehash
+
+ function called upon loading of config file
+ */
+void Instance::onRehash()
+{
+	// set our log level (std::vector<int>) (believe it or not)
+    nstring::str loglevel = "";
+    std::vector<nstring::str> loglevels;
+
+    logLevel.clear();
+    configReader->getValue(loglevel, "settings", "loglevel");
+
+    // convert our log level into numerics
+    utils::explode(" ", loglevel, loglevels);
+    for (std::vector<nstring::str>::iterator i = loglevels.begin(); i != loglevels.end(); ++i)
+    {
+        if (*i == "all")
+            logLevel.push_back(ALL);
+        if (*i == "debug")
+            logLevel.push_back(DEBUG);
+		if (*i == "misc")
+            logLevel.push_back(MISC);
+        if (*i == "error")
+            logLevel.push_back(ERROR);
+        if (*i == "network")
+            logLevel.push_back(NETWORK);
+        if (*i == "commands")
+            logLevel.push_back(COMMANDS);
+        if (*i == "admin")
+            logLevel.push_back(ADMIN);
+        if (*i == "register")
+            logLevel.push_back(REGISTER);
+		if (*i == "set")
+			logLevel.push_back(SET);
+        if (*i == "rawdata")
+            logLevel.push_back(RAWDATA);
+    }
+	//logIterator = logLevel.find(ALL);
+	std::sort(loglevel.begin(), loglevel.end());
 }
 
 /**
@@ -236,13 +280,15 @@ void Instance::log(int type, const nstring::str &text, ...)
 
     va_start(argsPtr, text);
     vsprintf(textBuffer, text.c_str(), argsPtr);
-
-    std::map<int, nstring::str>::iterator i = logLevel.find(type);
-
-    if (enableDebug)
-		std::cout << "[" << formattedTime << "] " << textBuffer << std::endl;
 	
-	// logchan etc.
+	if (std::binary_search(logLevel.begin(), logLevel.end(), 0) || std::binary_search(logLevel.begin(), logLevel.end(), type))
+    {
+		if (enableDebug)
+			std::cout << "[" << formattedTime << "] " << textBuffer << std::endl;
+		// std cout it if enableDebug is on
+		
+		// log file it.
+	}
 
     va_end(argsPtr);
 }
