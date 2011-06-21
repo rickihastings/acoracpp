@@ -15,17 +15,19 @@
 
 #include "base.h"
 
-/**
- Channel
-
- channel struct
-*/
+// A channel on the network
 struct Channel
 {
 	// name
 	nstring::str name;
 	// timestamp
 	std::time_t time;
+	
+	// topic
+	nstring::str topic;
+	// topic setter
+	nstring::str topicSetter;
+	
 	// modes
 	nstring::str modes;
 	// omodes (bans, exceptions, etc)

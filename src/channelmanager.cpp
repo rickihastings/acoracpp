@@ -305,6 +305,38 @@ void ChannelManager::handleQuit(nstring::str &uid)
 }
 
 /**
+ ChannelManager::handleNick
+
+ handle NICK changes, etc.
+*/
+void ChannelManager::handleNick(nstring::str &uid, nstring::str &nick)
+{
+	std::map<nstring::str, nstring::str>::iterator it;
+	Channel* channel;
+	User* user = instance->userManager->getUserFromId(uid);
+	// get the user struct, we get this and search qChans, so we know what
+	// channels they are in, we then find the channels and update their
+	// records to tell them that nick has changed.
+	
+	nstring::str unick = nick;
+	std::transform(unick.begin(), unick.end(), unick.begin(), ::tolower);
+	// to lower chan.
+	
+	for (std::vector<nstring::str>::iterator i = user->qChans.begin(); i != user->qChans.end(); ++i)
+	{
+		channel = getChannel(*i);
+		it = channel->users.find(user->oldNick);
+		if (it != channel->users.end())
+		{
+			channel->users.insert(std::pair<nstring::str, nstring::str>(unick, it->second));
+			channel->users.erase(it);
+		}
+		// the user SHOULD exist, but we check it anyway
+	}
+	// loop through qChans
+}
+
+/**
  ChannelManager::handleMode
 
  handle TMODE changes, etc.

@@ -15,11 +15,7 @@
 
 #include "base.h"
 
-/**
- User
-
- user struct
-*/
+// A user on the network
 struct User
 {
     // uid

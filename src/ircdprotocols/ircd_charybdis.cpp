@@ -194,6 +194,7 @@ class IRCdCommandNick : public IRCdCommand
 		void execute(nstring::str &src, nstring::str &paramStr, std::vector<nstring::str> &params)
 		{
 			instance->userManager->handleNick(src, params.at(0));
+			instance->channelManager->handleNick(src, params.at(0));
 			// we send the uid. into handleQuit
 		}
 };

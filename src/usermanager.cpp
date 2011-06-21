@@ -104,7 +104,7 @@ void UserManager::handleQuit(nstring::str &uid)
 */
 void UserManager::handleNick(nstring::str &uid, nstring::str &nick)
 {
-	static User* userHolder;
+	User* userHolder = NULL;
 	nstring::str userNick;
 	getNickFromId(uid, userNick);
 	// get the class from users
