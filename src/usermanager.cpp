@@ -13,6 +13,7 @@
 #include "instance.h"
 #include "usermanager.h"
 #include "modeparser.h"
+#include "ircdprotocol.h"
 #include "utils.h"
 
 #include <algorithm>
@@ -59,7 +60,8 @@ void UserManager::handleConnect(nstring::str &nick, nstring::str &ident, nstring
 	uidMap.insert(std::pair<nstring::str, nstring::str>(uid, unick));
 	// insert user into uid map so we can find it easily
 	
-	instance->log(MISC, "handleConnect(): " + nick + "!" + ident + "@" + host + " (" + uid + ") has connected to " + sid);
+	nstring::str server = instance->ircdProtocol->getServerFromId(sid);
+	instance->log(MISC, "handleConnect(): " + nick + "!" + ident + "@" + host + " (" + uid + ") has connected to " + server);
 	//instance->log(LOGCHAN, "// TODO");
 	// log things, ie LOGCHAN and NETWORK
 }
@@ -79,7 +81,8 @@ void UserManager::handleQuit(nstring::str &uid)
 	std::map<nstring::str, User*>::iterator it = users.find(nick);
 	if (i != uidMap.end() && it != users.end())
 	{
-		instance->log(MISC, "handleQuit(): " + it->second->nick + "!" + it->second->ident + "@" + it->second->host + " has disconnected from " + it->second->server);
+		nstring::str server = instance->ircdProtocol->getServerFromId(it->second->server);
+		instance->log(MISC, "handleQuit(): " + it->second->nick + "!" + it->second->ident + "@" + it->second->host + " has disconnected from " + server);
 		//instance->log(LOGCHAN, "// TODO");
 		// log things, ie LOGCHAN and NETWORK
 	
@@ -153,8 +156,6 @@ void UserManager::handleMode(nstring::str &uid, nstring::str &modes)
 	if (modeContainer["minus"].find('o') != std::string::npos)
 		handleOper(uid, false);
 	// check if we have a "-o", if we do again call handleOper()
-	
-	std::cout << user->modes.c_str();
 }
 
 /**

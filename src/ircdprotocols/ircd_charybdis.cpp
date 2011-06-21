@@ -291,6 +291,43 @@ class IRCdCommandTMode : public IRCdCommand
 		}
 };
 
+// :<uid> TOPIC <chan> :<topic>
+class IRCdCommandTopic : public IRCdCommand
+{
+	public:
+		IRCdCommandTopic() : IRCdCommand("TOPIC") { }
+		
+		void execute(nstring::str &src, nstring::str &paramStr, std::vector<nstring::str> &params)
+		{
+			nstring::str topic = utils::getDataAfter(params, 1);
+			utils::stripColon(topic);
+			User* user = instance->userManager->getUserFromId(src);
+			// get some data eh
+			
+			instance->channelManager->handleTopic(user->nick, params.at(0), topic);
+			// send data to channel manager
+		}
+};
+
+// :<uid> TB <chan> <timestamp> <host> :<topic>
+class IRCdCommandTB : public IRCdCommand
+{
+	public:
+		IRCdCommandTB() : IRCdCommand("TB") { }
+		
+		void execute(nstring::str&, nstring::str &paramStr, std::vector<nstring::str> &params)
+		{
+			nstring::str topic = utils::getDataAfter(params, 3);
+			utils::stripColon(topic);
+			std::vector<nstring::str> split;
+			utils::explode("!", params.at(2), split);
+			// get the topic, user etc.
+			
+			instance->channelManager->handleTopic(split.at(0), params.at(0), topic);
+			// send data to channel manager
+		}
+};
+
 // SERVER METHODS
 
 charybdisServer::charybdisServer() { }
@@ -351,6 +388,8 @@ charybdisProtocol::charybdisProtocol(void* h)
 	addCommand(new IRCdCommandJoin);
 	addCommand(new IRCdCommandPart);
 	addCommand(new IRCdCommandTMode);
+	addCommand(new IRCdCommandTopic);
+	addCommand(new IRCdCommandTB);
 	addCommand(new IRCdCommandPing);
 }
 

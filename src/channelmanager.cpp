@@ -162,8 +162,8 @@ void ChannelManager::handleCreate(nstring::str &chan, nstring::str &ts, nstring:
 		chans.insert(std::pair<nstring::str, Channel*>(uchan, channel));
 		channel->users.insert(parsedUsers.begin(), parsedUsers.end());
 		
-		instance->log(MISC, "handleCreate(): " + chan + " introduced to the network with a timestamp of " + ts);
-		// log things, ie NETWORK
+		instance->log(MISC, "handleCreate(): " + chan + " has been created with a timestamp of " + ts);
+		// log things, ie MISC
 	}
 	else
 	{
@@ -216,7 +216,7 @@ void ChannelManager::handleJoin(nstring::str &uid, nstring::str &ts, nstring::st
 	channel->users.insert(std::pair<nstring::str, nstring::str>(nick, ""));
 	
 	instance->log(MISC, "handleJoin(): " + nick + " has joined " + chan);
-	// log things, ie NETWORK
+	// log things, ie MISC
 }
 
 /**
@@ -263,7 +263,7 @@ void ChannelManager::handlePart(nstring::str &uid, nstring::str &chan)
 	// compared to searching every channel, AND every user array at the same time.
 	
 	instance->log(MISC, "handlePart(): " + nick + " has left " + chan);
-	// log things, ie NETWORK
+	// log things, ie MISC
 }
 
 /**
@@ -351,4 +351,21 @@ void ChannelManager::handleMode(nstring::str &uid, nstring::str &chan, nstring::
 	Channel* channel = getChannel(chan);
 	instance->modeParser->saveModes(channel, modeContainer, paramContainer);
 	// update the modes in our channel record
+}
+
+/**
+ ChannelManager::handleTopic
+
+ handle TOPIC
+*/
+void ChannelManager::handleTopic(nstring::str &nick, nstring::str &chan, nstring::str &topic)
+{
+	Channel* channel = getChannel(chan);
+	// get channel
+	
+	channel->topic = topic;
+	channel->topicSetter = nick;
+	
+	instance->log(MISC, "handleTopic(): " + nick + " has changed the topic for " + chan + " to (" + topic + ")");
+	// log things, ie NETWORK
 }

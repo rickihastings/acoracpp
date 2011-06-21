@@ -47,9 +47,7 @@ public:
 	// handle mode
 	void handleMode(nstring::str&, nstring::str&, nstring::str&);
 	// handle topic
-	
-	// handle tb (TS6)
-	
+	void handleTopic(nstring::str&, nstring::str&, nstring::str&);
 	// handle bmask (TS6)
 	
 };
