@@ -120,11 +120,7 @@ std::map<nstring::str, nstring::str> ChannelManager::parseUsers(std::vector<nstr
 */
 Channel* ChannelManager::getChannel(nstring::str &chan)
 {
-	nstring::str uchan = chan;
-	std::transform(uchan.begin(), uchan.end(), uchan.begin(), ::tolower);
-	// to lower it, seen as though everything in chans is tolower.
-	
-	std::map<nstring::str, Channel*>::iterator it = chans.find(uchan);
+	std::map<nstring::str, Channel*>::iterator it = chans.find(chan);
 	if (it != chans.end())
 	{
 		return it->second;
@@ -157,7 +153,7 @@ void ChannelManager::handleCreate(nstring::str &chan, nstring::str &ts, nstring:
 	
 	nstring::str uchan = chan;
 	std::transform(uchan.begin(), uchan.end(), uchan.begin(), ::tolower);
-	it = chans.find(chan);
+	it = chans.find(uchan);
 	// ::tolower chan
 	
 	if (it == chans.end())
@@ -185,6 +181,17 @@ void ChannelManager::handleCreate(nstring::str &chan, nstring::str &ts, nstring:
 	instance->modeParser->sortModes(modes, modeContainer, paramContainer, true);
 	instance->modeParser->saveModes(channel, modeContainer, paramContainer);
 	// parse modes and save modes..
+	
+	User* user = NULL;
+	nstring::str tempNick;
+	for (std::map<nstring::str, nstring::str>::iterator pit = parsedUsers.begin(); pit != parsedUsers.end(); ++pit)
+	{
+		tempNick = pit->first;
+		user = instance->userManager->getUser(tempNick);
+		user->qChans.push_back(uchan);
+		// get the nick & channel
+	}
+	// for channel->users and update the user's qChan vector
 }
 
 /**
@@ -194,11 +201,18 @@ void ChannelManager::handleCreate(nstring::str &chan, nstring::str &ts, nstring:
 */
 void ChannelManager::handleJoin(nstring::str &uid, nstring::str &ts, nstring::str &chan)
 {
-	Channel* channel = getChannel(chan);
+	nstring::str uchan = chan;
+	std::transform(uchan.begin(), uchan.end(), uchan.begin(), ::tolower);
+	// to lower chan
+	
+	Channel* channel = getChannel(uchan);
 	nstring::str nick;
+	
 	instance->userManager->getNickFromId(uid, nick);
+	User* user = instance->userManager->getUser(nick);
 	// get the nick & channel
 	
+	user->qChans.push_back(uchan);
 	channel->users.insert(std::pair<nstring::str, nstring::str>(nick, ""));
 	
 	instance->log(MISC, "handleJoin(): " + nick + " has joined " + chan);
@@ -212,33 +226,82 @@ void ChannelManager::handleJoin(nstring::str &uid, nstring::str &ts, nstring::st
 */
 void ChannelManager::handlePart(nstring::str &uid, nstring::str &chan)
 {
-	Channel* channel = getChannel(chan);
+	nstring::str uchan = chan;
+	std::transform(uchan.begin(), uchan.end(), uchan.begin(), ::tolower);
+	// to lower chan.
+
 	std::map<nstring::str, Channel*>::iterator i = chans.find(chan);
 	nstring::str nick;
+	std::vector<nstring::str>::iterator qit;
+	
 	instance->userManager->getNickFromId(uid, nick);
+	User* user = instance->userManager->getUser(nick);
 	// get the nick & channel
 	
-	std::map<nstring::str, nstring::str>::iterator it = channel->users.find(nick);
-	if (it == channel->users.end())
+	std::map<nstring::str, nstring::str>::iterator it = i->second->users.find(nick);
+	if (it == i->second->users.end())
 	{
 		instance->log(ERROR, "handlePart(): trying to find user in channel map on part, can't find user!");
 		return;
 	}
 	// can't find user in channel->users. major issue?
 	
-	channel->users.erase(it);
-	
-	if (channel->users.empty())
+	i->second->users.erase(it);
+	if (i->second->users.empty())
 	{
-		delete channel;
+		delete i->second;
 		chans.erase(i);
 	}
 	// remove the user from our internal channel->users array, ALSO
 	// check if our internal array matches 0, if it does the channel
 	// is empty so delete it.
 	
+	qit = std::find(user->qChans.begin(), user->qChans.end(), uchan);
+	if (qit != user->qChans.end())
+		user->qChans.erase(qit);
+	// the user struct also contains a method to quickly see what channels a user is in
+	// compared to searching every channel, AND every user array at the same time.
+	
 	instance->log(MISC, "handlePart(): " + nick + " has left " + chan);
 	// log things, ie NETWORK
+}
+
+/**
+ ChannelManager::handleQuit
+
+ usually we wouldn't have to do anything upon QUIT, but we need to remove
+ the quitting user from all channel arrays..
+*/
+void ChannelManager::handleQuit(nstring::str &uid)
+{
+	nstring::str nick;
+	instance->userManager->getNickFromId(uid, nick);
+	User* user = instance->userManager->getUser(nick);
+	// get the user.
+	
+	for (std::vector<nstring::str>::iterator i = user->qChans.begin(); i != user->qChans.end(); ++i)
+	{
+		std::map<nstring::str, Channel*>::iterator cit = chans.find(*i);
+		std::map<nstring::str, nstring::str>::iterator it = cit->second->users.find(nick);
+		if (it == cit->second->users.end())
+		{
+			instance->log(ERROR, "handleQuit(): trying to find user in channel map on part, can't find user!");
+			continue;
+		}
+		// can't find user in channel->users. major issue?
+		
+		cit->second->users.erase(it);
+		if (cit->second->users.empty())
+		{
+			delete cit->second;
+			chans.erase(cit);
+		}
+		// again, we just delete the channel if this is the last user in it.
+	}
+	// remove the user from all channel users' maps. confusing yeah.
+	
+	user->qChans.clear();
+	// just clear it, might aswell.
 }
 
 /**

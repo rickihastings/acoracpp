@@ -61,6 +61,8 @@ struct User
     bool usePrivmsg;
     // language
     nstring::str language;
+	// qchans
+	std::vector<nstring::str> qChans;
 
     // constructor
 	User(nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, std::time_t&);

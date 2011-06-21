@@ -179,6 +179,7 @@ class IRCdCommandQuit : public IRCdCommand
 		
 		void execute(nstring::str &src, nstring::str &paramStr, std::vector<nstring::str> &params)
 		{
+			instance->channelManager->handleQuit(src);
 			instance->userManager->handleQuit(src);
 			// we send the uid. into handleQuit
 		}
@@ -223,7 +224,7 @@ class IRCdCommandCHGHost : public IRCdCommand
 		void execute(nstring::str &src, nstring::str &paramStr, std::vector<nstring::str> &params)
 		{
 			instance->userManager->handleHost(params.at(0), params.at(1));
-			// we send the uid. into handleQuit
+			// we send the uid. into handleHost
 		}
 };
 
