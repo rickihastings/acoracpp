@@ -328,6 +328,29 @@ class IRCdCommandTB : public IRCdCommand
 		}
 };
 
+// :<sid> BMASK <timestamp> <chan> <mode> :<params>
+class IRCdCommandBMask : public IRCdCommand
+{
+	public:
+		IRCdCommandBMask() : IRCdCommand("BMASK") { }
+		
+		void execute(nstring::str &src, nstring::str &paramStr, std::vector<nstring::str> &params)
+		{
+			nstring::str newMode = "+";
+			std::vector<nstring::str> split, postSplit;
+			utils::explode(":", paramStr, split);
+			utils::explode(" ", split.at(1), postSplit);
+			
+			for (std::vector<nstring::str>::iterator it = postSplit.begin(); it != postSplit.end(); ++it)
+				newMode += params.at(2);
+			newMode = newMode + " " + split.at(1);
+			// find out how many params we've got, then multiply <mode> by it. and prepend <mode> with a +
+		
+			instance->channelManager->handleMode(src, params.at(1), newMode);
+			// send data to channel manager
+		}
+};
+
 // SERVER METHODS
 
 charybdisServer::charybdisServer() { }
@@ -390,6 +413,7 @@ charybdisProtocol::charybdisProtocol(void* h)
 	addCommand(new IRCdCommandTMode);
 	addCommand(new IRCdCommandTopic);
 	addCommand(new IRCdCommandTB);
+	addCommand(new IRCdCommandBMask);
 	addCommand(new IRCdCommandPing);
 }
 

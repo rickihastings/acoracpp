@@ -48,8 +48,6 @@ public:
 	void handleMode(nstring::str&, nstring::str&, nstring::str&);
 	// handle topic
 	void handleTopic(nstring::str&, nstring::str&, nstring::str&);
-	// handle bmask (TS6)
-	
 };
 
 #endif // CHANNELMANAGER_H
