@@ -10,16 +10,8 @@
 //                                                   //
 //===================================================//
 
-#include "ircd_charybdis.h"
-
 #include "instance.h"
-#include "stringparser.h"
-#include "configreader.h"
-#include "socketengine.h"
-#include "config.h"
-#include "exception.h"
-#include "usermanager.h"
-#include "channelmanager.h"
+#include "ircd_charybdis.h"
 
 #include <algorithm>
 

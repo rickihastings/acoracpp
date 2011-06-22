@@ -13,6 +13,13 @@
 #include "ircdprotocol.h"
 #include "ircdcommand.h"
 #include "server.h"
+#include "stringparser.h"
+#include "configreader.h"
+#include "socketengine.h"
+#include "config.h"
+#include "exception.h"
+#include "usermanager.h"
+#include "channelmanager.h"
 
 #include <deque>
 

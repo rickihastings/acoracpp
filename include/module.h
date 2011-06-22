@@ -9,8 +9,6 @@
 //      Please see the file COPYING for details.     //
 //                                                   //
 //===================================================//
-// $Id: module.h 708 2009-02-01 11:48:00Z ankit $
-//===================================================//
 
 #ifndef	MODULE_H
 #define	MODULE_H
@@ -18,6 +16,8 @@
 #include "base.h"
 
 #include <bitset>
+#include <boost/thread.hpp>
+#include <boost/bind.hpp>
 
 // flags
 namespace flags
@@ -30,6 +30,8 @@ namespace flags
 		};
 	}
 }
+
+class ModuleManager;
 
 // base class for modules
 class Module
@@ -49,10 +51,28 @@ public:
 	Module(void* handle, const nstring::str version, const nstring::str type, unsigned long flags = 0);
 	// destructor
 	virtual ~Module();
+	
+	// join
+	virtual void onJoin(int, int);
 };
 
-// macro to initialize a module
-#define initModule(class_name) \
+/**
+ FOREACH_MODULE
+
+ macro to call a method in all modules
+*/
+#define FOREACH_MODULE(x, y, z...) \
+    for (std::map<std::string, Module*>::iterator mit = x->moduleManager->moduleList.begin(); mit != x->moduleManager->moduleList.end(); ++mit) \
+    { \
+		boost::thread newThread(boost::bind(y, mit->second, z)); \
+	}
+
+/**
+ INIT_MODULE
+
+ macro to initialize a module
+*/
+#define INIT_MODULE(class_name) \
 	extern "C" Module* getModule(void* handle) \
 	{ \
 		return new class_name(handle); \

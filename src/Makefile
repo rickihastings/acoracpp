@@ -19,7 +19,7 @@ all: acora
 	$(CXX) $(EFLAGS) $(CFLAGS) -c $<
 
 acora: $(OBJS)
-	$(CXX) $(EFLAGS) $(LFLAGS) $(LDL) $(OBJS) -o acora
+	$(CXX) $(EFLAGS) $(LFLAGS) $(LDL) $(OBJS) -o acora /usr/lib/libboost_thread.so.1.42.0
 
 remake: clean all
 

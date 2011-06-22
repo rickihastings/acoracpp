@@ -9,8 +9,6 @@
 //      Please see the file COPYING for details.     //
 //                                                   //
 //===================================================//
-// $Id: module.cpp 698 2009-01-29 16:33:02Z ankit $
-//===================================================//
 
 #include "module.h"
 
@@ -24,3 +22,5 @@ Module::Module(void* h, const nstring::str ver, const nstring::str t, unsigned l
 Module::~Module()
 { }
 
+void Module::onJoin(int, int)
+{ }

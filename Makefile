@@ -16,9 +16,9 @@ include ./Makefile.inc
 DBGFLAGS= -ggdb2
 OPTFLAGS= -O2
 
-CFLAGS= -pipe -export-dynamic -Wall -pedantic -Wshadow -Woverloaded-virtual -fPIC -DPIC -I../include
-LFLAGS= -pipe -export-dynamic -fPIC -DPIC
-MCFLAGS= -pipe -pedantic -I../../include -export-dynamic -Wshadow -Wall -Woverloaded-virtual -fPIC -DPIC
+CFLAGS= -pipe -export-dynamic -Wall -pedantic -Wno-variadic-macros -Wshadow -Woverloaded-virtual -fPIC -DPIC -I../include
+LFLAGS= -pipe -export-dynamic -fPIC -DPIC -I/usr/include/boost -L/usr/lib
+MCFLAGS= -pipe -pedantic -I../../include -export-dynamic -Wno-variadic-macros -Wshadow -Wall -Woverloaded-virtual -fPIC -DPIC
 MLFLAGS= -pipe -shared -export-dynamic -fPIC -DPIC
 
 COREARGS= 'CXX=${CXX}' 'EFLAGS=${OPTFLAGS}' 'LDL=${LDL}' 'CFLAGS=${CFLAGS}' 'LFLAGS=${LFLAGS}'

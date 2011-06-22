@@ -9,21 +9,29 @@
 //      Please see the file COPYING for details.     //
 //                                                   //
 //===================================================//
-// $Id: m_foobar.cpp 688 2009-01-29 00:05:25Z ankit $
-//===================================================//
 
 #include "module.h"
+
+#include <iostream>
 
 // the module class
 class ModuleFoobar : public Module
 {
-public:
+	public:
+	
 	// constructor
 	ModuleFoobar(void* h)
-	: Module(h, "$Id: m_foobar.cpp 688 2009-01-29 00:05:25Z ankit $", "General")
-	{ }
+	: Module(h, "m_foobar.cpp", "General")
+	{
+		
+	}
+	
+	virtual void onJoin(int t1, int t2)
+	{
+		std::cout << "FUCKIN TEST MAN " << t1 << " " << t2 << std::endl;
+	}
 };
 
 // initialize the module
-initModule(ModuleFoobar)
+INIT_MODULE(ModuleFoobar)
 

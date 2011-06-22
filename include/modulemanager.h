@@ -9,8 +9,6 @@
 //      Please see the file COPYING for details.     //
 //                                                   //
 //===================================================//
-// $Id: modulemanager.h 708 2009-02-01 11:48:00Z ankit $
-//===================================================//
 
 #ifndef	MODULEMANAGER_H
 #define	MODULEMANAGER_H

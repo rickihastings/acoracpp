@@ -9,8 +9,6 @@
 //      Please see the file COPYING for details.     //
 //                                                   //
 //===================================================//
-// $Id: modulemanager.cpp 708 2009-02-01 11:48:00Z ankit $
-//===================================================//
 
 #include "modulemanager.h"
 #include "instance.h"
@@ -23,6 +21,7 @@
 #include "exception.h"
 
 #include <dlfcn.h>
+#include <iostream>
 
 template<typename T>
 T* ModuleManager::getObject(ErrorCode &error, std::string &path, const std::string func)
@@ -349,4 +348,3 @@ void ModuleManager::loadAutoloadModules(std::deque<nstring::str> &mods)
 			++i;
 	}
 }
-
