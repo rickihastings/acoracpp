@@ -21,7 +21,6 @@
 #include "exception.h"
 
 #include <dlfcn.h>
-#include <iostream>
 
 template<typename T>
 T* ModuleManager::getObject(ErrorCode &error, std::string &path, const std::string func)
@@ -36,16 +35,16 @@ T* ModuleManager::getObject(ErrorCode &error, std::string &path, const std::stri
 	if (!handle)
 	{
 		error = err::modulemanager::noHandle;
-		instance->error = nstring::str() + "dlopen() error: " + dlerror();
+		instance->error = "getObject(): " + nstring::str() + "dlopen() error: " + dlerror();
 		return NULL;
 	}
-	
+
 	*(static_cast<void**>(reinterpret_cast<void*>(&getobject))) = dlsym(handle, func.c_str());
 
 	if (dlerror())
 	{
 		dlclose(handle);
-		instance->error = "Module does not have a get function";
+		instance->error = "getObject(): Module does not have a get function";
 		error = err::modulemanager::noGet;
 		return NULL;
 	}
@@ -74,7 +73,7 @@ T* ModuleManager::getObject(ErrorCode &error, std::string &path, const std::stri
 			delete object;
 
 		dlclose(handle);
-		instance->error = nstring::str() + "Module threw a standard exception: " + e.what();
+		instance->error = "getObject(): " + nstring::str() + "Module threw a standard exception: " + e.what();
 		error = err::modulemanager::exception;
 		return NULL;
 	}
@@ -82,7 +81,7 @@ T* ModuleManager::getObject(ErrorCode &error, std::string &path, const std::stri
 	if (!object)
 	{
 		dlclose(handle);
-		instance->error = "Module returned a NULL object";
+		instance->error = "getObject(): Module returned a NULL object";
 		error = err::modulemanager::nullObject;
 	}
 	
@@ -128,7 +127,7 @@ ErrorCode ModuleManager::unloadSocketEngine()
 	destroyObject<SocketEngine>(instance->socketEngine, const_cast<void*>(instance->socketEngine->handle));	
 	instance->socketEngine = NULL;
 	
-	instance->log(DEBUG, "ModuleManager(): Unloaded SocketEngine.");
+	instance->log(DEBUG, "unloadSocketEngine(): Unloaded SocketEngine.");
 	return err::modulemanager::none;
 }
 
@@ -141,18 +140,18 @@ ErrorCode ModuleManager::unloadIRCdProtocol()
 	destroyObject<IRCdProtocol>(instance->ircdProtocol, const_cast<void*>(instance->ircdProtocol->handle));	
 	instance->ircdProtocol = NULL;
 
-	instance->log(DEBUG, "ModuleManager(): Unloaded IRCdProtocol.");
+	instance->log(DEBUG, "unloadIRCdProtocol(): Unloaded IRCdProtocol.");
 	return err::modulemanager::none;
 }
 
 
 ErrorCode ModuleManager::loadSocketEngine(nstring::str name)
 {
-	instance->log(DEBUG, "ModuleManager(): Loading SocketEngine " + name + " ...");
+	instance->log(DEBUG, "loadSocketEngine(): Loading SocketEngine " + name + " ...");
 	
 	if (instance->socketEngine)
 	{
-		instance->log(DEBUG, "ModuleManager(): A SocketEngine is already loaded.");
+		instance->log(DEBUG, "loadSocketEngine(): A SocketEngine is already loaded.");
 		return err::modulemanager::alreadyLoaded;
 	}
 
@@ -164,18 +163,18 @@ ErrorCode ModuleManager::loadSocketEngine(nstring::str name)
 	if (!(instance->socketEngine = getObject<SocketEngine>(error, path, "getSocketEngine")))
 		return error;
 
-	instance->log(DEBUG, "ModuleManager(): " + name + " loaded successfully.");
+	instance->log(DEBUG, "loadSocketEngine(): " + name + " loaded successfully.");
 	return err::modulemanager::none;
 }
 
 
 ErrorCode ModuleManager::loadIRCdProtocol(nstring::str name)
 {
-	instance->log(DEBUG, "ModuleManager(): Loading IRCdProtocol " + name + " ...");
+	instance->log(DEBUG, "loadIRCdProtocol(): Loading IRCdProtocol " + name + " ...");
 
 	if (instance->ircdProtocol)
 	{
-		instance->log(DEBUG, "ModuleManager(): An IRCdProtocol is already loaded.");
+		instance->log(DEBUG, "loadIRCdProtocol(): An IRCdProtocol is already loaded.");
 		return err::modulemanager::alreadyLoaded;
 	}
 
@@ -187,25 +186,25 @@ ErrorCode ModuleManager::loadIRCdProtocol(nstring::str name)
 	if (!(instance->ircdProtocol = getObject<IRCdProtocol>(error, path, "getIRCdProtocol")))
 		return error;
 	
-	instance->log(DEBUG, "ModuleManager(): " + name + " loaded successfully.");
+	instance->log(DEBUG, "loadIRCdProtocol(): " + name + " loaded successfully.");
 	return err::modulemanager::none;
 }
 
 
 ErrorCode ModuleManager::loadDiskManager(nstring::str &name, bool force)
 {
-	instance->log(DEBUG, "ModuleManager(): Loading DiskManager " + name + " ...");
+	instance->log(DEBUG, "loadDiskManager(): Loading DiskManager " + name + " ...");
 
 	if (instance->diskManager)
 	{
 		if (force)
 		{
-			instance->log(DEBUG, "ModuleManager(): Unloading loaded DiskManager ...");
+			instance->log(DEBUG, "loadDiskManager(): Unloading loaded DiskManager ...");
 			unloadDiskManager();
 		}
 		else
 		{
-			instance->log(DEBUG, "ModuleManager(): A DiskManager is already loaded.");
+			instance->log(DEBUG, "loadDiskManager(): A DiskManager is already loaded.");
 			return err::modulemanager::alreadyLoaded;
 		}
 	}
@@ -218,7 +217,7 @@ ErrorCode ModuleManager::loadDiskManager(nstring::str &name, bool force)
 	if (!(instance->diskManager = getObject<DiskManager>(error, path, "getDiskManager")))
 		return error;
 	
-	instance->log(DEBUG, "ModuleManager(): " + name + " loaded successfully.");
+	instance->log(DEBUG, "loadDiskManager(): " + name + " loaded successfully.");
 	return err::modulemanager::none;
 }
 
@@ -231,25 +230,25 @@ ErrorCode ModuleManager::unloadDiskManager()
 	destroyObject<DiskManager>(instance->diskManager, const_cast<void*>(instance->diskManager->handle));	
 	instance->diskManager = NULL;
 
-	instance->log(DEBUG, "ModuleManager(): Unloaded DiskManager.");
+	instance->log(DEBUG, "unloadDiskManager(): Unloaded DiskManager.");
 	return err::modulemanager::none;
 }
 
 
 ErrorCode ModuleManager::loadModule(nstring::str &name)
 {
-	if (name.find(".so") != std::string::npos)
+	if (name.find(".so") != nstring::str::npos)
 	{
 		for (short i = 0; i < 3; ++i)
 			name.erase(name.end() - 1);
 	}
 
-	instance->log(DEBUG, "ModuleManager(): Loading module " + name + " ...");
+	instance->log(DEBUG, "loadModule(): Loading module " + name + " ...");
 	
 	std::map<std::string, Module*>::iterator mod = this->moduleList.find(name.c_str());
 	if (mod != this->moduleList.end())
 	{
-		instance->log(DEBUG, "ModuleManager(): " + name + " is already loaded.");
+		instance->log(DEBUG, "loadModule(): " + name + " is already loaded.");
 		return err::modulemanager::alreadyLoaded;
 	}
 
@@ -262,13 +261,13 @@ ErrorCode ModuleManager::loadModule(nstring::str &name)
 
 	if (!m)
 	{
-		instance->log(ERROR, "ModuleManager(): " + instance->error);
+		instance->log(ERROR, instance->error);
 		return error;
 	}
 	else
 		this->moduleList[name.c_str()] = m;
 	
-	instance->log(DEBUG, "ModuleManager(): " + name + " loaded successfully.");
+	instance->log(DEBUG, "loadModule(): " + name + " loaded successfully.");
 	return err::modulemanager::none;
 }
 
@@ -276,11 +275,11 @@ ErrorCode ModuleManager::loadModule(nstring::str &name)
 ErrorCode ModuleManager::unloadModule(std::map<std::string, Module*>::iterator &mod, bool force)
 {
 	nstring::str name = mod->first.c_str();
-	instance->log(DEBUG, "Unloading " + name + " ...");
+	instance->log(DEBUG, "unloadModule(): Unloading " + name + " ...");
 	
 	if (!force && mod->second->flags[flags::module::perm])
 	{
-		instance->log(DEBUG, "ModuleManager(): " + name + " is flagged permanent.");
+		instance->log(DEBUG, "unloadModule(): " + name + " is flagged permanent.");
 		return err::modulemanager::perm;
 	}
 	
@@ -289,18 +288,18 @@ ErrorCode ModuleManager::unloadModule(std::map<std::string, Module*>::iterator &
 	
 	destroyObject<Module>(m, const_cast<void*>(m->handle));
 
-	instance->log(DEBUG, "ModuleManager(): " + name + " unloaded.");
+	instance->log(DEBUG, "unloadModule(): " + name + " unloaded.");
 	return err::modulemanager::none;
 }
 
 ErrorCode ModuleManager::reloadModule(std::map<std::string, Module*>::iterator &mod, bool force)
 {
 	nstring::str name = mod->first.c_str();
-	instance->log(DEBUG, "ModuleManager(): Reloading " + name + " ...");
+	instance->log(DEBUG, "reloadModule(): Reloading " + name + " ...");
 	
 	if (!force && mod->second->flags[flags::module::perm])
 	{
-		instance->log(DEBUG, name + " is flagged permanent.");
+		instance->log(DEBUG, "reloadModule(): " + name + " is flagged permanent.");
 		return err::modulemanager::perm;
 	}
 	
@@ -312,7 +311,7 @@ ErrorCode ModuleManager::reloadModule(std::map<std::string, Module*>::iterator &
 
 	if (!newm)
 	{
-		instance->log(ERROR, "ModuleManager(): " + instance->error);
+		instance->log(ERROR, instance->error);
 		return error;
 	}
 	else
@@ -320,7 +319,7 @@ ErrorCode ModuleManager::reloadModule(std::map<std::string, Module*>::iterator &
 
 	destroyObject<Module>(m, const_cast<void*>(m->handle));
 
-	instance->log(DEBUG, "ModuleManager(): " + name + " reloaded.");
+	instance->log(DEBUG, "reloadModule(): " + name + " reloaded.");
 	return err::modulemanager::none;
 }
 
@@ -348,3 +347,4 @@ void ModuleManager::loadAutoloadModules(std::deque<nstring::str> &mods)
 			++i;
 	}
 }
+

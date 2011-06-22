@@ -61,7 +61,7 @@ public:
 	
 	// constructor
 	SelectEngine(void* h)
-	: SocketEngine(h, "$Id: sock_select.cpp 692 2009-01-29 09:15:03Z ankit $")
+	: SocketEngine(h, "sock_select.cpp 0.0.1 acora")
 	{ }
 	
 	

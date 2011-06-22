@@ -64,6 +64,9 @@ void UserManager::handleConnect(nstring::str &nick, nstring::str &ident, nstring
 	instance->log(MISC, "handleConnect(): " + nick + "!" + ident + "@" + host + " (" + uid + ") has connected to " + server);
 	//instance->log(LOGCHAN, "// TODO");
 	// log things, ie LOGCHAN and NETWORK
+	
+	//FOREACH_MODULE(instance, &Module::onConnect, nick, uid, ident, host, realhost, ip, modes, gecos, sid);
+	// TODO
 }
 
 /**
@@ -98,6 +101,9 @@ void UserManager::handleQuit(nstring::str &uid)
 	
 	instance->log(ERROR, "handleQuit(): Cannot find the user in user map, this will possibly cause a leak!");
 	// log a few things here
+	
+	//FOREACH_MODULE(instance, &Module::onQuit, uid);
+	// TODO
 }
 
 /**
@@ -132,6 +138,8 @@ void UserManager::handleNick(nstring::str &uid, nstring::str &nick)
 	users.insert(std::pair<nstring::str, User*>(lnick, userHolder));
 	users.erase(it);
 	// update some info
+	
+	//FOREACH_MODULE(instance, &Module::onNick, userNick, nick);
 }
 
 /**
@@ -156,6 +164,9 @@ void UserManager::handleMode(nstring::str &uid, nstring::str &modes)
 	if (modeContainer["minus"].find('o') != std::string::npos)
 		handleOper(uid, false);
 	// check if we have a "-o", if we do again call handleOper()
+	
+	//FOREACH_MODULE(instance, &Module::onUserMode, user->nick, modeContainer);
+	// TODO
 }
 
 /**
@@ -178,7 +189,10 @@ void UserManager::handleHost(nstring::str &uid, nstring::str &host)
 	
 	it->second->oldHost = it->second->host;
 	it->second->host = host;
-	// update host name ^_^
+	// update host name
+	
+	//FOREACH_MODULE(instance, &Module::onHostChange, userNick, host);
+	// TODO
 }
 
 /**
@@ -195,6 +209,9 @@ void UserManager::handleOper(nstring::str &uid, bool mode)
 	//instance->log(MISC, "handleConnect(): " + nick + "!" + ident + "@" + host + " has connected to " + sid);
 	//instance->log(LOGCHAN, "// TODO");
 	// log things, ie LOGCHAN and NETWORK
+	
+	//FOREACH_MODULE(instance, &Module::onJoin, userHolder->nick, mode);
+	// TODO
 }
 
 /**

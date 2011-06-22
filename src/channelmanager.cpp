@@ -16,8 +16,8 @@
 #include "modeparser.h"
 #include "channelmanager.h"
 #include "usermanager.h"
-
-#include <iostream>
+#include "modulemanager.h"
+#include "module.h"
 
 /**
  ChannelManager::ChannelManager
@@ -217,6 +217,8 @@ void ChannelManager::handleJoin(nstring::str &uid, nstring::str &ts, nstring::st
 	
 	instance->log(MISC, "handleJoin(): " + nick + " has joined " + chan);
 	// log things, ie MISC
+
+	//FOREACH_MODULE(instance, &Module::onJoin, nick, chan);
 }
 
 /**
@@ -264,6 +266,8 @@ void ChannelManager::handlePart(nstring::str &uid, nstring::str &chan)
 	
 	instance->log(MISC, "handlePart(): " + nick + " has left " + chan);
 	// log things, ie MISC
+	
+	//FOREACH_MODULE(instance, &Module::onPart, nick, chan);
 }
 
 /**
@@ -320,7 +324,7 @@ void ChannelManager::handleNick(nstring::str &uid, nstring::str &nick)
 	
 	nstring::str unick = nick;
 	std::transform(unick.begin(), unick.end(), unick.begin(), ::tolower);
-	// to lower chan.
+	// to lower.
 	
 	for (std::vector<nstring::str>::iterator i = user->qChans.begin(); i != user->qChans.end(); ++i)
 	{
@@ -351,6 +355,9 @@ void ChannelManager::handleMode(nstring::str &uid, nstring::str &chan, nstring::
 	Channel* channel = getChannel(chan);
 	instance->modeParser->saveModes(channel, modeContainer, paramContainer);
 	// update the modes in our channel record
+	
+	//FOREACH_MODULE(instance, &Module::onMode, nick, chan, modeContainer, paramContainer);
+	// TODO
 }
 
 /**
@@ -363,9 +370,15 @@ void ChannelManager::handleTopic(nstring::str &nick, nstring::str &chan, nstring
 	Channel* channel = getChannel(chan);
 	// get channel
 	
-	channel->topic = topic;
-	channel->topicSetter = nick;
+	nstring::str unick = nick;
+	std::transform(unick.begin(), unick.end(), unick.begin(), ::tolower);
+	// to lower chan.
 	
-	instance->log(MISC, "handleTopic(): " + nick + " has changed the topic for " + chan + " to (" + topic + ")");
+	channel->topic = topic;
+	channel->topicSetter = unick;
+	
+	instance->log(MISC, "handleTopic(): " + unick + " has changed the topic for " + chan + " to (" + topic + ")");
 	// log things, ie NETWORK
+	
+	//FOREACH_MODULE(instance, &Module::onTopic, unick, chan, topic);
 }

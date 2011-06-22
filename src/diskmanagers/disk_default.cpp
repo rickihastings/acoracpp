@@ -9,8 +9,6 @@
 //      Please see the file COPYING for details.     //
 //                                                   //
 //===================================================//
-// $Id: disk_default.cpp 688 2009-01-29 00:05:25Z ankit $
-//===================================================//
 
 #include "diskmanager.h"
 
@@ -20,7 +18,7 @@ class DiskDefault : public DiskManager
 public:
 	// constructor
 	DiskDefault(void* h)
-	: DiskManager(h, "$Id: disk_default.cpp 688 2009-01-29 00:05:25Z ankit $")
+	: DiskManager(h, "disk_default.cpp 0.0.1 acora")
 	{ }
 };
 

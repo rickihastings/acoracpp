@@ -17,7 +17,6 @@
 
 #include <bitset>
 #include <boost/thread.hpp>
-#include <boost/bind.hpp>
 
 // flags
 namespace flags
@@ -53,7 +52,7 @@ public:
 	virtual ~Module();
 	
 	// join
-	virtual void onJoin(int, int);
+	virtual void onJoin(nstring::str&, nstring::str&);
 };
 
 /**
@@ -64,7 +63,7 @@ public:
 #define FOREACH_MODULE(x, y, z...) \
     for (std::map<std::string, Module*>::iterator mit = x->moduleManager->moduleList.begin(); mit != x->moduleManager->moduleList.end(); ++mit) \
     { \
-		boost::thread newThread(boost::bind(y, mit->second, z)); \
+		boost::thread newThread(y, mit->second, z); \
 	}
 
 /**

@@ -73,8 +73,12 @@ class Instance
 	const bool enableDebug;
 	// services keep running till this value is true
 	bool keepRunning;
+	// booted
+	bool hasError;
 	// loglevel
 	std::vector<int> logLevel;
+	// debug buffer
+	std::vector<nstring::str> debugBuffer;
 
 public:
 
@@ -121,6 +125,8 @@ public:
 	void onRehash();
 	// log
 	void log(int type, const nstring::str &text, ...);
+	// showdebug
+	void showDebug();
 	
 	// clean up everything and prepare to die
 	void cleanup();

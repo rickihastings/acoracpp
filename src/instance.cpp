@@ -57,6 +57,7 @@ Instance::Instance(int &ac, char **av, const bool &d) :
 	argv(av),
 	enableDebug(d),
 	keepRunning(true),
+	hasError(true),
 	now(std::time(NULL)),
 	moduleManager(NULL),
 	socketEngine(NULL),
@@ -110,6 +111,7 @@ ErrorCode Instance::start()
 	{
 		banner::text("Could not open config file \"acora.conf\"");
 		banner::end();
+		showDebug();
 		return err::exit::configreader;
 	}
 	else if (!errors.empty())
@@ -125,6 +127,7 @@ ErrorCode Instance::start()
 		if (r == err::configreader::errors)
 		{
 			banner::end();
+			showDebug();
 			return err::exit::configreader;
 		}
 	}
@@ -139,6 +142,7 @@ ErrorCode Instance::start()
 	{
 		banner::text("Could not load SocketEngine " + se + ": " + instance->error);
 		banner::end();
+		showDebug();
 		return err::exit::modulemanager;
 	}
 
@@ -149,6 +153,7 @@ ErrorCode Instance::start()
 	{
 		banner::text("Could not load IRCdProtocol " + ip + ": " + instance->error);
 		banner::end();
+		showDebug();
 		return err::exit::ircdprotocol;
 	}
 	
@@ -157,6 +162,7 @@ ErrorCode Instance::start()
 	{
 		banner::text("Could not connect: " + instance->error);
 		banner::end();
+		showDebug();
 		return err::exit::socketengine;
 	}
 	
@@ -169,12 +175,15 @@ ErrorCode Instance::start()
 		
 		for (std::deque<nstring::str>::iterator i = errors.begin(); i != errors.end(); ++i)
 			banner::text("  - " + *i);
+		banner::end();
+		showDebug();
 	}
 	
 	if (!enableDebug && isatty(0) && isatty(1) && isatty(2) && kill(getppid(), SIGTERM) == -1)
 	{
 		banner::text(nstring::str() + "Error killing parent process: " + std::strerror(errno));
 		banner::end();
+		showDebug();
 	}
 
 	if (!enableDebug)
@@ -186,6 +195,8 @@ ErrorCode Instance::start()
 		}
 	}
 	
+	showDebug();
+	
 	// initialize user and channel managers
 	userManager = new UserManager;
 	channelManager = new ChannelManager;
@@ -194,7 +205,11 @@ ErrorCode Instance::start()
 	return run();
 }
 
+/**
+ Instance::run
 
+ main loop
+ */
 ErrorCode Instance::run()
 {
 	nstring::str buffer;
@@ -280,17 +295,33 @@ void Instance::log(int type, const nstring::str &text, ...)
 
     va_start(argsPtr, text);
     vsprintf(textBuffer, text.c_str(), argsPtr);
+	std::stringstream output;
+	output << "[" << formattedTime << "] " << textBuffer;
 	
 	if (std::binary_search(logLevel.begin(), logLevel.end(), 0) || std::binary_search(logLevel.begin(), logLevel.end(), type))
     {
-		if (enableDebug)
-			std::cout << "[" << formattedTime << "] " << textBuffer << std::endl;
+		if (enableDebug && !hasError)
+			std::cout << output.str().c_str() << std::endl;
+		else if (enableDebug && hasError)
+			debugBuffer.push_back(output.str().c_str());
 		// std cout it if enableDebug is on
 		
 		// log file it.
 	}
 
     va_end(argsPtr);
+}
+
+void Instance::showDebug()
+{
+	hasError = false;
+	if (enableDebug && !debugBuffer.empty())
+	{
+		std::vector<nstring::str>::iterator it;
+		for (it = debugBuffer.begin(); it != debugBuffer.end(); ++it)
+			std::cout << (*it).c_str() << std::endl;
+		debugBuffer.clear();
+	}
 }
 
 std::time_t Instance::time(time_t since)

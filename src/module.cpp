@@ -22,5 +22,5 @@ Module::Module(void* h, const nstring::str ver, const nstring::str t, unsigned l
 Module::~Module()
 { }
 
-void Module::onJoin(int, int)
+void Module::onJoin(nstring::str&, nstring::str&)
 { }

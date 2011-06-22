@@ -352,7 +352,7 @@ charybdisServer::~charybdisServer() { }
 // PROTOCOL METHODS
 
 charybdisProtocol::charybdisProtocol(void* h)
-: IRCdProtocol(h, "$Id: ircd_charybdis.cpp 707 2009-01-31 21:52:15Z ricki $")
+: IRCdProtocol(h, "ircd_charybdis.cpp 0.0.2 acora")
 {
 	// we're using charybdis::ircd as a global variable so that
 	// all IRCdCommands can make use of it
