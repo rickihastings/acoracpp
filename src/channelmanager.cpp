@@ -192,6 +192,9 @@ void ChannelManager::handleCreate(nstring::str &chan, nstring::str &ts, nstring:
 		// get the nick & channel
 	}
 	// for channel->users and update the user's qChan vector
+	
+	FOREACH_MODULE(instance, &Module::onChanCreate, chan, parsedUsers);
+	// on chan create
 }
 
 /**
@@ -218,7 +221,7 @@ void ChannelManager::handleJoin(nstring::str &uid, nstring::str &ts, nstring::st
 	instance->log(MISC, "handleJoin(): " + nick + " has joined " + chan);
 	// log things, ie MISC
 
-	//FOREACH_MODULE(instance, &Module::onJoin, nick, chan);
+	FOREACH_MODULE(instance, &Module::onJoin, nick, chan);
 }
 
 /**
@@ -267,7 +270,7 @@ void ChannelManager::handlePart(nstring::str &uid, nstring::str &chan)
 	instance->log(MISC, "handlePart(): " + nick + " has left " + chan);
 	// log things, ie MISC
 	
-	//FOREACH_MODULE(instance, &Module::onPart, nick, chan);
+	FOREACH_MODULE(instance, &Module::onPart, nick, chan);
 }
 
 /**
@@ -356,7 +359,7 @@ void ChannelManager::handleMode(nstring::str &uid, nstring::str &chan, nstring::
 	instance->modeParser->saveModes(channel, modeContainer, paramContainer);
 	// update the modes in our channel record
 	
-	//FOREACH_MODULE(instance, &Module::onMode, nick, chan, modeContainer, paramContainer);
+	FOREACH_MODULE(instance, &Module::onCMode, chan, modeContainer, paramContainer);
 	// TODO
 }
 
@@ -380,5 +383,5 @@ void ChannelManager::handleTopic(nstring::str &nick, nstring::str &chan, nstring
 	instance->log(MISC, "handleTopic(): " + unick + " has changed the topic for " + chan + " to (" + topic + ")");
 	// log things, ie NETWORK
 	
-	//FOREACH_MODULE(instance, &Module::onTopic, unick, chan, topic);
+	FOREACH_MODULE(instance, &Module::onTopic, unick, chan, topic);
 }

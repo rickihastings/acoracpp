@@ -51,8 +51,30 @@ public:
 	// destructor
 	virtual ~Module();
 	
-	// join
+	// on create
+	virtual void onChanCreate(nstring::str&, std::map<nstring::str, nstring::str>&);
+	// on join
 	virtual void onJoin(nstring::str&, nstring::str&);
+	// on part
+	virtual void onPart(nstring::str&, nstring::str&);
+	// on kick
+	
+	// on mode
+	virtual void onCMode(nstring::str&, irc::modes&, irc::params&);
+	// on topic
+	virtual void onTopic(nstring::str&, nstring::str&, nstring::str&);
+	// on connect
+	virtual void onConnect(nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&);
+	// on quit
+	virtual void onQuit(nstring::str&);
+	// on nick
+	virtual void onNick(nstring::str&, nstring::str&);
+	// on umode
+	virtual void onUMode(nstring::str&, irc::modes&);
+	// on host change
+	virtual void onHostChange(nstring::str&, nstring::str&);
+	// on oper
+	virtual void onOper(nstring::str&, bool&);
 };
 
 /**

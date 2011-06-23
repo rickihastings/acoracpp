@@ -26,9 +26,9 @@ class ModuleFoobar : public Module
 		
 	}
 	
-	virtual void onJoin(nstring::str &nick, nstring::str &chan)
+	virtual void onChanCreate(nstring::str &chan, std::map<nstring::str, nstring::str> &users)
 	{
-		std::cout << "FUCKIN TEST MAN " << nick.c_str() << " " << chan.c_str() << std::endl;
+		
 	}
 };
 

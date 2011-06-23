@@ -155,7 +155,7 @@ void IRCdProtocol::remServer(nstring::str &sid)
 	// find the server, and remove it.
 	servers.erase(it);
 	
-	instance->log(MISC, "remServer(): " + server + ":" + sid + " has disconnected from the network");
+	instance->log(MISC, "remServer(): " + server + " (" + sid + ") has disconnected from the network");
 	//instance->log(LOGCHAN, "// TODO");
 	// log things, ie LOGCHAN and NETWORK
 }
