@@ -58,7 +58,7 @@ public:
 	// on part
 	virtual void onPart(nstring::str&, nstring::str&);
 	// on kick
-	
+	virtual void onKick(nstring::str&, nstring::str&, nstring::str&);
 	// on mode
 	virtual void onCMode(nstring::str&, irc::modes&, irc::params&);
 	// on topic

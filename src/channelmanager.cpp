@@ -274,6 +274,56 @@ void ChannelManager::handlePart(nstring::str &uid, nstring::str &chan)
 }
 
 /**
+ ChannelManager::handleKick
+
+ handle KICK
+*/
+void ChannelManager::handleKick(nstring::str &uid, nstring::str &chan, nstring::str &who)
+{
+	nstring::str uchan = chan;
+	std::transform(uchan.begin(), uchan.end(), uchan.begin(), ::tolower);
+	// to lower chan.
+
+	std::map<nstring::str, Channel*>::iterator i = chans.find(chan);
+	nstring::str nick, whonick;
+	std::vector<nstring::str>::iterator qit;
+	
+	instance->userManager->getNickFromId(uid, nick);
+	instance->userManager->getNickFromId(who, whonick);
+	User* user = instance->userManager->getUser(whonick);
+	// get the nick & channel
+	
+	std::map<nstring::str, nstring::str>::iterator it = i->second->users.find(whonick);
+	if (it == i->second->users.end())
+	{
+		instance->log(ERROR, "handleKick(): trying to find user in channel map on part, can't find user!");
+		return;
+	}
+	// can't find user in channel->users. major issue?
+	
+	i->second->users.erase(it);
+	if (i->second->users.empty())
+	{
+		delete i->second;
+		chans.erase(i);
+	}
+	// remove the user from our internal channel->users array, ALSO
+	// check if our internal array matches 0, if it does the channel
+	// is empty so delete it.
+	
+	qit = std::find(user->qChans.begin(), user->qChans.end(), uchan);
+	if (qit != user->qChans.end())
+		user->qChans.erase(qit);
+	// the user struct also contains a method to quickly see what channels a user is in
+	// compared to searching every channel, AND every user array at the same time.
+	
+	instance->log(MISC, "handleKick(): " + whonick + " has been kicked from " + chan + " by " + nick);
+	// log things, ie MISC
+	
+	FOREACH_MODULE(instance, &Module::onKick, nick, whonick, chan);
+}
+
+/**
  ChannelManager::handleQuit
 
  usually we wouldn't have to do anything upon QUIT, but we need to remove

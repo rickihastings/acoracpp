@@ -31,6 +31,9 @@ void Module::onJoin(nstring::str&, nstring::str&)
 void Module::onPart(nstring::str&, nstring::str&)
 { }
 
+void Module::onKick(nstring::str&, nstring::str&, nstring::str&)
+{ }
+
 void Module::onCMode(nstring::str&, irc::modes&, irc::params&)
 { }
 

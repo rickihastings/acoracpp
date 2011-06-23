@@ -269,6 +269,19 @@ class IRCdCommandPart : public IRCdCommand
 		}
 };
 
+// :<uid> KICK <chan> <target> :<reason>
+class IRCdCommandKick : public IRCdCommand
+{
+	public:
+		IRCdCommandKick() : IRCdCommand("KICK") { }
+		
+		void execute(nstring::str &src, nstring::str &paramStr, std::vector<nstring::str> &params)
+		{
+			instance->channelManager->handleKick(src, params.at(0), params.at(1));
+			// send data to channel manager
+		}
+};
+
 // :<uid> TMODE <timestamp> <chan> <modes>
 class IRCdCommandTMode : public IRCdCommand
 {
@@ -402,6 +415,7 @@ charybdisProtocol::charybdisProtocol(void* h)
 	addCommand(new IRCdCommandSJoin);
 	addCommand(new IRCdCommandJoin);
 	addCommand(new IRCdCommandPart);
+	addCommand(new IRCdCommandKick);
 	addCommand(new IRCdCommandTMode);
 	addCommand(new IRCdCommandTopic);
 	addCommand(new IRCdCommandTB);

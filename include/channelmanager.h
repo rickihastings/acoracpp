@@ -41,7 +41,7 @@ public:
 	// handle part
 	void handlePart(nstring::str&, nstring::str&);
 	// handle kick
-	void handleKick(nstring::str&, nstring::str&);
+	void handleKick(nstring::str&, nstring::str&, nstring::str&);
 	// handle quit
 	void handleQuit(nstring::str&);
 	// handle nick changes (believe it or not)
