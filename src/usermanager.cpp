@@ -48,7 +48,7 @@ UserManager::~UserManager()
 
  handle incoming users
 */
-void UserManager::handleConnect(nstring::str &nick, nstring::str &ident, nstring::str &host, nstring::str &realhost, nstring::str &ip, nstring::str &accountName, nstring::str &nickTS, nstring::str &uid, nstring::str &modes, nstring::str &sid, nstring::str &gecos)
+void UserManager::handleConnect(nstring::str &nick, nstring::str &ident, nstring::str &host, nstring::str &ip, nstring::str &nickTS, nstring::str &uid, nstring::str &sid, nstring::str &gecos)
 {
 	std::time_t timeStamp;
 	std::istringstream stream(nickTS.c_str());
@@ -58,7 +58,7 @@ void UserManager::handleConnect(nstring::str &nick, nstring::str &ident, nstring
 	nstring::str unick = nick;
 	std::transform(unick.begin(), unick.end(), unick.begin(), ::tolower);
 	
-	users.insert(std::pair<nstring::str, User*>(unick, new User(uid, nick, ident, host, realhost, ip, modes, gecos, sid, timeStamp)));
+	users.insert(std::pair<nstring::str, User*>(unick, new User(uid, nick, ident, host, ip, gecos, sid, timeStamp)));
 	uidMap.insert(std::pair<nstring::str, nstring::str>(uid, unick));
 	// insert user into uid map so we can find it easily
 	

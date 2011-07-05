@@ -23,6 +23,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include <boost/thread.hpp>
+
 // the base class for all classes
 class Base
 {

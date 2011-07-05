@@ -32,7 +32,7 @@ public:
 	virtual ~UserManager();
 	
 	// handle connect
-	void handleConnect(nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&);
+	void handleConnect(nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&);
 	// handle quit
 	void handleQuit(nstring::str&);
 	// handle nick

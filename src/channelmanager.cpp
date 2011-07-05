@@ -19,6 +19,8 @@
 #include "modulemanager.h"
 #include "module.h"
 
+#include <iostream>
+
 /**
  ChannelManager::ChannelManager
 
@@ -167,24 +169,23 @@ void ChannelManager::handleCreate(nstring::str &chan, nstring::str &ts, nstring:
 	}
 	else
 	{
-		oldUsers = channel->users;
-		channel->users.clear();
-		
-		parsedUsers.insert(oldUsers.begin(), oldUsers.end());
+		channel = getChannel(uchan);
 		channel->users.insert(parsedUsers.begin(), parsedUsers.end());
 		// set some vars in our Channel*
 	}
-	// create a new channel.
 	
-	irc::modes modeContainer;
-	irc::params paramContainer;
-	instance->modeParser->sortModes(modes, modeContainer, paramContainer, true);
-	instance->modeParser->saveModes(channel, modeContainer, paramContainer);
+	if (!modes.empty())
+	{
+		irc::modes modeContainer;
+		irc::params paramContainer;
+		instance->modeParser->sortModes(modes, modeContainer, paramContainer, true);
+		instance->modeParser->saveModes(channel, modeContainer, paramContainer);
+	}
 	// parse modes and save modes..
 	
 	User* user = NULL;
 	nstring::str tempNick;
-	for (std::map<nstring::str, nstring::str>::iterator pit = parsedUsers.begin(); pit != parsedUsers.end(); ++pit)
+	for (std::map<nstring::str, nstring::str>::iterator pit = channel->users.begin(); pit != channel->users.end(); ++pit)
 	{
 		tempNick = pit->first;
 		user = instance->userManager->getUser(tempNick);

@@ -16,7 +16,6 @@
 #include "base.h"
 
 #include <bitset>
-#include <boost/thread.hpp>
 
 // flags
 namespace flags

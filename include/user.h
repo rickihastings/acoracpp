@@ -30,8 +30,6 @@ struct User
     nstring::str host;
     // old host
     nstring::str oldHost;
-	// real host
-	nstring::str realHost;
 	// ip address
 	nstring::str ipAddress;
 	
@@ -61,7 +59,7 @@ struct User
 	std::vector<nstring::str> qChans;
 
     // constructor
-	User(nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, std::time_t&);
+	User(nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, std::time_t&);
     // destructor
     virtual ~User();
 };

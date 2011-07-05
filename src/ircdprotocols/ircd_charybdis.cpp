@@ -51,6 +51,19 @@ class IRCdCommandNotice : public IRCdCommand
 		}
 };
 
+// :<source> SID <server> <hop count> <sid> :<server gecos>
+class IRCdCommandSid : public IRCdCommand
+{
+	public:
+		IRCdCommandSid() : IRCdCommand("SID") { }
+
+		void execute(nstring::str&, nstring::str &paramStr, std::vector<nstring::str> &params)
+		{
+			charybdis::ircd->addServer(params.at(0), params.at(2));
+			// send data to the core
+		}
+};
+
 // PASS <pass> TS 6 <sid>
 class IRCdCommandPass : public IRCdCommand
 {
@@ -157,7 +170,7 @@ class IRCdCommandEUID : public IRCdCommand
 			utils::stripColon(gecos);
 			// gecos probably has a :, let's remove it for our buddy userManager
 			
-			instance->userManager->handleConnect(params.at(0), params.at(4), params.at(5), params.at(8), params.at(6), params.at(9), params.at(2), params.at(7), params.at(3), src, gecos);
+			instance->userManager->handleConnect(params.at(0), params.at(4), params.at(5), params.at(6), params.at(2), params.at(7), src, gecos);
 			// we send user manager some information about the user we just recieved. like so;
 			// > nick, username, hostname, real hostname, ip address, account name, nickts, uid, umodes, src, gecos
 		}
@@ -401,6 +414,7 @@ charybdisProtocol::charybdisProtocol(void* h)
 
 	// add commands.
 	addCommand(new IRCdCommandNotice);
+	addCommand(new IRCdCommandSid);
 	addCommand(new IRCdCommandPass);
 	addCommand(new IRCdCommandServer);
 	addCommand(new IRCdCommandCapab);
