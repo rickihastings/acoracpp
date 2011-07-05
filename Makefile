@@ -8,15 +8,13 @@
 #      Please see the file COPYING for details.     #
 #                                                   #
 #===================================================#
-# $Id: Makefile 671 2009-01-16 18:58:16Z ankit $
-#===================================================#
 
 include ./Makefile.inc
 
 DBGFLAGS= -ggdb2
 OPTFLAGS= -O2
 
-CFLAGS= -pipe -export-dynamic -Wall -pedantic -Wno-variadic-macros -Wshadow -Woverloaded-virtual -fPIC -DPIC -I../include
+CFLAGS= -pipe -export-dynamic -Wall -pedantic -Wno-variadic-macros -Wshadow -Woverloaded-virtual -fPIC -DPIC -std=c++0x -I../include
 LFLAGS= -pipe -export-dynamic -fPIC -DPIC -I/usr/include/boost -L/usr/lib
 MCFLAGS= -pipe -pedantic -I../../include -export-dynamic -Wno-variadic-macros -Wshadow -Wall -Woverloaded-virtual -fPIC -DPIC
 MLFLAGS= -pipe -shared -export-dynamic -fPIC -DPIC

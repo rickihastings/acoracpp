@@ -36,7 +36,7 @@ ChannelManager::ChannelManager()
 */
 ChannelManager::~ChannelManager()
 {
-	std::map<nstring::str, Channel*>::iterator i;
+	irc::chan_hash::iterator i;
 	for (i = chans.begin(); i != chans.end(); ++i)
 		delete i->second;
 	chans.clear();
@@ -48,9 +48,9 @@ ChannelManager::~ChannelManager()
  parse: @+42XAAAABG @42XAAAABF into Nickname => ov, OtherNick => o
  also parse: ov,42XAAAABG o,42XAAAABG into Nickname => ov, OtherNick => o
 */
-std::map<nstring::str, nstring::str> ChannelManager::parseUsers(std::vector<nstring::str>& users)
+irc::nhash ChannelManager::parseUsers(std::vector<nstring::str>& users)
 {
-	std::map<nstring::str, nstring::str> parsedUsers;
+	irc::nhash parsedUsers;
 	std::vector<nstring::str> split;
 	nstring::str tempNick, tempModes, newModes, tempPrefix, tempSuffix;
 	if (users.empty())
@@ -122,7 +122,7 @@ std::map<nstring::str, nstring::str> ChannelManager::parseUsers(std::vector<nstr
 */
 Channel* ChannelManager::getChannel(nstring::str &chan)
 {
-	std::map<nstring::str, Channel*>::iterator it = chans.find(chan);
+	irc::chan_hash::iterator it = chans.find(chan);
 	if (it != chans.end())
 	{
 		return it->second;
@@ -143,9 +143,9 @@ Channel* ChannelManager::getChannel(nstring::str &chan)
 void ChannelManager::handleCreate(nstring::str &chan, nstring::str &ts, nstring::str &modes, std::vector<nstring::str> &users)
 {
 	Channel* channel = NULL;
-	std::map<nstring::str, Channel*>::iterator it;
-	std::map<nstring::str, nstring::str> parsedUsers = parseUsers(users);
-	std::map<nstring::str, nstring::str> oldUsers;
+	irc::chan_hash::iterator it = chans.find(chan);
+	irc::nhash parsedUsers = parseUsers(users);
+	irc::nhash oldUsers;
 	// parse up users
 	
 	std::time_t timeStamp;
@@ -153,15 +153,10 @@ void ChannelManager::handleCreate(nstring::str &chan, nstring::str &ts, nstring:
 	stream >> timeStamp;
 	// get the channel timestamp
 	
-	nstring::str uchan = chan;
-	std::transform(uchan.begin(), uchan.end(), uchan.begin(), ::tolower);
-	it = chans.find(uchan);
-	// ::tolower chan
-	
 	if (it == chans.end())
 	{
 		channel = new Channel(chan, timeStamp);
-		chans.insert(std::pair<nstring::str, Channel*>(uchan, channel));
+		chans.insert(std::pair<nstring::str, Channel*>(chan, channel));
 		channel->users.insert(parsedUsers.begin(), parsedUsers.end());
 		
 		instance->log(MISC, "handleCreate(): " + chan + " has been created with a timestamp of " + ts);
@@ -169,7 +164,7 @@ void ChannelManager::handleCreate(nstring::str &chan, nstring::str &ts, nstring:
 	}
 	else
 	{
-		channel = getChannel(uchan);
+		channel = getChannel(chan);
 		channel->users.insert(parsedUsers.begin(), parsedUsers.end());
 		// set some vars in our Channel*
 	}
@@ -185,11 +180,11 @@ void ChannelManager::handleCreate(nstring::str &chan, nstring::str &ts, nstring:
 	
 	User* user = NULL;
 	nstring::str tempNick;
-	for (std::map<nstring::str, nstring::str>::iterator pit = channel->users.begin(); pit != channel->users.end(); ++pit)
+	for (irc::nhash::iterator pit = channel->users.begin(); pit != channel->users.end(); ++pit)
 	{
 		tempNick = pit->first;
 		user = instance->userManager->getUser(tempNick);
-		user->qChans.push_back(uchan);
+		user->qChans.push_back(chan);
 		// get the nick & channel
 	}
 	// for channel->users and update the user's qChan vector
@@ -205,18 +200,14 @@ void ChannelManager::handleCreate(nstring::str &chan, nstring::str &ts, nstring:
 */
 void ChannelManager::handleJoin(nstring::str &uid, nstring::str &ts, nstring::str &chan)
 {
-	nstring::str uchan = chan;
-	std::transform(uchan.begin(), uchan.end(), uchan.begin(), ::tolower);
-	// to lower chan
-	
-	Channel* channel = getChannel(uchan);
+	Channel* channel = getChannel(chan);
 	nstring::str nick;
 	
 	instance->userManager->getNickFromId(uid, nick);
 	User* user = instance->userManager->getUser(nick);
 	// get the nick & channel
 	
-	user->qChans.push_back(uchan);
+	user->qChans.push_back(chan);
 	channel->users.insert(std::pair<nstring::str, nstring::str>(nick, ""));
 	
 	instance->log(MISC, "handleJoin(): " + nick + " has joined " + chan);
@@ -232,11 +223,7 @@ void ChannelManager::handleJoin(nstring::str &uid, nstring::str &ts, nstring::st
 */
 void ChannelManager::handlePart(nstring::str &uid, nstring::str &chan)
 {
-	nstring::str uchan = chan;
-	std::transform(uchan.begin(), uchan.end(), uchan.begin(), ::tolower);
-	// to lower chan.
-
-	std::map<nstring::str, Channel*>::iterator i = chans.find(chan);
+	irc::chan_hash::iterator i = chans.find(chan);
 	nstring::str nick;
 	std::vector<nstring::str>::iterator qit;
 	
@@ -244,7 +231,7 @@ void ChannelManager::handlePart(nstring::str &uid, nstring::str &chan)
 	User* user = instance->userManager->getUser(nick);
 	// get the nick & channel
 	
-	std::map<nstring::str, nstring::str>::iterator it = i->second->users.find(nick);
+	irc::nhash::iterator it = i->second->users.find(nick);
 	if (it == i->second->users.end())
 	{
 		instance->log(ERROR, "handlePart(): trying to find user in channel map on part, can't find user!");
@@ -262,7 +249,7 @@ void ChannelManager::handlePart(nstring::str &uid, nstring::str &chan)
 	// check if our internal array matches 0, if it does the channel
 	// is empty so delete it.
 	
-	qit = std::find(user->qChans.begin(), user->qChans.end(), uchan);
+	qit = std::find(user->qChans.begin(), user->qChans.end(), chan);
 	if (qit != user->qChans.end())
 		user->qChans.erase(qit);
 	// the user struct also contains a method to quickly see what channels a user is in
@@ -281,11 +268,7 @@ void ChannelManager::handlePart(nstring::str &uid, nstring::str &chan)
 */
 void ChannelManager::handleKick(nstring::str &uid, nstring::str &chan, nstring::str &who)
 {
-	nstring::str uchan = chan;
-	std::transform(uchan.begin(), uchan.end(), uchan.begin(), ::tolower);
-	// to lower chan.
-
-	std::map<nstring::str, Channel*>::iterator i = chans.find(chan);
+	irc::chan_hash::iterator i = chans.find(chan);
 	nstring::str nick, whonick;
 	std::vector<nstring::str>::iterator qit;
 	
@@ -294,7 +277,7 @@ void ChannelManager::handleKick(nstring::str &uid, nstring::str &chan, nstring::
 	User* user = instance->userManager->getUser(whonick);
 	// get the nick & channel
 	
-	std::map<nstring::str, nstring::str>::iterator it = i->second->users.find(whonick);
+	irc::nhash::iterator it = i->second->users.find(whonick);
 	if (it == i->second->users.end())
 	{
 		instance->log(ERROR, "handleKick(): trying to find user in channel map on part, can't find user!");
@@ -312,7 +295,7 @@ void ChannelManager::handleKick(nstring::str &uid, nstring::str &chan, nstring::
 	// check if our internal array matches 0, if it does the channel
 	// is empty so delete it.
 	
-	qit = std::find(user->qChans.begin(), user->qChans.end(), uchan);
+	qit = std::find(user->qChans.begin(), user->qChans.end(), chan);
 	if (qit != user->qChans.end())
 		user->qChans.erase(qit);
 	// the user struct also contains a method to quickly see what channels a user is in
@@ -339,8 +322,8 @@ void ChannelManager::handleQuit(nstring::str &uid)
 	
 	for (std::vector<nstring::str>::iterator i = user->qChans.begin(); i != user->qChans.end(); ++i)
 	{
-		std::map<nstring::str, Channel*>::iterator cit = chans.find(*i);
-		std::map<nstring::str, nstring::str>::iterator it = cit->second->users.find(nick);
+		irc::chan_hash::iterator cit = chans.find(*i);
+		irc::nhash::iterator it = cit->second->users.find(nick);
 		if (it == cit->second->users.end())
 		{
 			instance->log(ERROR, "handleQuit(): trying to find user in channel map on part, can't find user!");
@@ -369,16 +352,12 @@ void ChannelManager::handleQuit(nstring::str &uid)
 */
 void ChannelManager::handleNick(nstring::str &uid, nstring::str &nick)
 {
-	std::map<nstring::str, nstring::str>::iterator it;
+	irc::nhash::iterator it;
 	Channel* channel;
 	User* user = instance->userManager->getUserFromId(uid);
 	// get the user struct, we get this and search qChans, so we know what
 	// channels they are in, we then find the channels and update their
 	// records to tell them that nick has changed.
-	
-	nstring::str unick = nick;
-	std::transform(unick.begin(), unick.end(), unick.begin(), ::tolower);
-	// to lower.
 	
 	for (std::vector<nstring::str>::iterator i = user->qChans.begin(); i != user->qChans.end(); ++i)
 	{
@@ -386,7 +365,7 @@ void ChannelManager::handleNick(nstring::str &uid, nstring::str &nick)
 		it = channel->users.find(user->oldNick);
 		if (it != channel->users.end())
 		{
-			channel->users.insert(std::pair<nstring::str, nstring::str>(unick, it->second));
+			channel->users.insert(std::pair<nstring::str, nstring::str>(nick, it->second));
 			channel->users.erase(it);
 		}
 		// the user SHOULD exist, but we check it anyway
@@ -424,15 +403,11 @@ void ChannelManager::handleTopic(nstring::str &nick, nstring::str &chan, nstring
 	Channel* channel = getChannel(chan);
 	// get channel
 	
-	nstring::str unick = nick;
-	std::transform(unick.begin(), unick.end(), unick.begin(), ::tolower);
-	// to lower chan.
-	
 	channel->topic = topic;
-	channel->topicSetter = unick;
+	channel->topicSetter = nick;
 	
-	instance->log(MISC, "handleTopic(): " + unick + " has changed the topic for " + chan + " to (" + topic + ")");
+	instance->log(MISC, "handleTopic(): " + nick + " has changed the topic for " + chan + " to (" + topic + ")");
 	// log things, ie NETWORK
 	
-	FOREACH_MODULE(instance, &Module::onTopic, unick, chan, topic);
+	FOREACH_MODULE(instance, &Module::onTopic, nick, chan, topic);
 }

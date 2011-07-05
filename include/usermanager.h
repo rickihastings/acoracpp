@@ -20,9 +20,9 @@
 class UserManager
 {
 	// uid map
-	std::map<nstring::str, nstring::str> uidMap;
+	irc::nhash uidMap;
 	// internal user map
-	std::map<nstring::str, User*> users;
+	irc::user_hash users;
 	
 public:
 

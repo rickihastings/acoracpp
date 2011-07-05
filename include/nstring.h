@@ -9,8 +9,6 @@
 //      Please see the file COPYING for details.     //
 //                                                   //
 //===================================================//
-// $Id: nstring.h 685 2009-01-28 22:47:17Z ankit $
-//===================================================//
 
 #ifndef	NSTRING_H
 #define	NSTRING_H
@@ -34,6 +32,24 @@ namespace nstring
 	
 	// implements acora_char_traits
 	typedef std::basic_string<char, nstring::char_traits, std::allocator<char> > str;
+	
+	// case insensitive string hash compare
+	struct ci_less : std::binary_function<nstring::str, nstring::str, bool>
+	{
+		// case-independent (ci) compare_less binary function
+		struct nocase_compare : public std::binary_function<unsigned char, unsigned char, bool> 
+		{
+			bool operator() (const unsigned char& c1, const unsigned char& c2) const {
+				return tolower (c1) < tolower (c2); 
+			}
+		};
+		bool operator() (const nstring::str &s1, const nstring::str &s2) const {
+			return std::lexicographical_compare 
+			(s1.begin(), s1.end(),   // source range
+			s2.begin(), s2.end(),   // dest range
+			nocase_compare());  // comparison
+		}
+	};
 } // namespace nstring
 
 #endif // NSTRING_H

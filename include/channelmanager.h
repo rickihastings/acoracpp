@@ -20,7 +20,7 @@
 class ChannelManager
 {
 	// internal channel map
-	std::map<nstring::str, Channel*> chans;
+	irc::chan_hash chans;
 
 public:
 
@@ -30,7 +30,7 @@ public:
 	virtual ~ChannelManager();
 	
 	// parse user string
-	std::map<nstring::str, nstring::str> parseUsers(std::vector<nstring::str>&);
+	irc::nhash parseUsers(std::vector<nstring::str>&);
 	
 	// get channel
 	Channel* getChannel(nstring::str&);

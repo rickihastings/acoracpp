@@ -33,7 +33,7 @@ struct Channel
 	// omodes (bans, exceptions, etc)
 	std::map<nstring::str, nstring::str> oModes;
 	// users (parsed)
-	std::map<nstring::str, nstring::str> users;
+	irc::nhash users;
 
 	// constructor
 	Channel(nstring::str&, std::time_t&);

@@ -36,7 +36,7 @@ UserManager::UserManager()
 */
 UserManager::~UserManager()
 {
-	std::map<nstring::str, User*>::iterator i;
+	irc::user_hash::iterator i;
 	for (i = users.begin(); i != users.end(); ++i)
 		delete i->second;
 	users.clear();
@@ -55,11 +55,8 @@ void UserManager::handleConnect(nstring::str &nick, nstring::str &ident, nstring
 	stream >> timeStamp;
 	// get the user timestamp
 	
-	nstring::str unick = nick;
-	std::transform(unick.begin(), unick.end(), unick.begin(), ::tolower);
-	
-	users.insert(std::pair<nstring::str, User*>(unick, new User(uid, nick, ident, host, ip, gecos, sid, timeStamp)));
-	uidMap.insert(std::pair<nstring::str, nstring::str>(uid, unick));
+	users.insert(std::pair<nstring::str, User*>(nick, new User(uid, nick, ident, host, ip, gecos, sid, timeStamp)));
+	uidMap.insert(std::pair<nstring::str, nstring::str>(uid, nick));
 	// insert user into uid map so we can find it easily
 	
 	nstring::str server = instance->ircdProtocol->getServerFromId(sid);
@@ -81,8 +78,8 @@ void UserManager::handleQuit(nstring::str &uid)
 	getNickFromId(uid, nick);
 	// get nickname from uid.
 	
-	std::map<nstring::str, nstring::str>::iterator i = uidMap.find(uid);
-	std::map<nstring::str, User*>::iterator it = users.find(nick);
+	irc::nhash::iterator i = uidMap.find(uid);
+	irc::user_hash::iterator it = users.find(nick);
 	if (i != uidMap.end() && it != users.end())
 	{
 		nstring::str server = instance->ircdProtocol->getServerFromId(it->second->server);
@@ -117,12 +114,9 @@ void UserManager::handleNick(nstring::str &uid, nstring::str &nick)
 	nstring::str userNick;
 	getNickFromId(uid, userNick);
 	// get the class from users
-	nstring::str lnick = nick;
-	std::transform(lnick.begin(), lnick.end(), lnick.begin(), ::tolower);
-	// tolower our nick
 	
-	std::map<nstring::str, User*>::iterator it = users.find(userNick);
-	std::map<nstring::str, nstring::str>::iterator i = uidMap.find(uid);
+	irc::user_hash::iterator it = users.find(userNick);
+	irc::nhash::iterator i = uidMap.find(uid);
 	// find uid maps
 	
 	instance->log(MISC, "handleNick(): " + it->second->nick + "!" + it->second->ident + "@" + it->second->host + " changed nick to " + nick);
@@ -130,12 +124,12 @@ void UserManager::handleNick(nstring::str &uid, nstring::str &nick)
 	// log things, ie LOGCHAN and NETWORK
 	
 	userHolder = it->second;
-	i->second = lnick;
+	i->second = nick;
 		
 	userHolder->oldNick = userHolder->nick;
 	userHolder->nick = nick;
 		
-	users.insert(std::pair<nstring::str, User*>(lnick, userHolder));
+	users.insert(std::pair<nstring::str, User*>(nick, userHolder));
 	users.erase(it);
 	// update some info
 	
@@ -181,7 +175,7 @@ void UserManager::handleHost(nstring::str &uid, nstring::str &host)
 	getNickFromId(uid, userNick);
 	// get the class from users
 	
-	std::map<nstring::str, User*>::iterator it = users.find(userNick);
+	irc::user_hash::iterator it = users.find(userNick);
 	// find uid maps
 	
 	instance->log(MISC, "handleHost(): " + it->second->nick + "!" + it->second->ident + "@" + it->second->host + " changed hostname to " + host);
@@ -222,7 +216,7 @@ void UserManager::handleOper(nstring::str &uid, bool mode)
 */
 void UserManager::getNickFromId(nstring::str &uid, nstring::str &nick)
 {
-	std::map<nstring::str, nstring::str>::iterator it = uidMap.find(uid);
+	irc::nhash::iterator it = uidMap.find(uid);
 	
 	if (it != uidMap.end())
 		nick = it->second;
@@ -253,11 +247,7 @@ User* UserManager::getUserFromId(nstring::str &uid)
 */
 User* UserManager::getUser(nstring::str &nick)
 {
-	nstring::str unick = nick;
-	std::transform(unick.begin(), unick.end(), unick.begin(), ::tolower);
-	// to lower it, seen as though everything in users is tolower.
-	
-	std::map<nstring::str, User*>::iterator it = users.find(unick);
+	irc::user_hash::iterator it = users.find(nick);
 	if (it != users.end())
 	{
 		return it->second;

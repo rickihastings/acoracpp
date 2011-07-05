@@ -9,8 +9,6 @@
 //      Please see the file COPYING for details.     //
 //                                                   //
 //===================================================//
-// $Id: charmaps.h 685 2009-01-28 22:47:17Z ankit $
-//===================================================//
 
 #ifndef	CHARMAPS_H
 #define	CHARMAPS_H
