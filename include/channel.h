@@ -21,7 +21,7 @@ struct Channel
 	// name
 	nstring::str name;
 	// timestamp
-	std::time_t time;
+	nstring::str time;
 	
 	// topic
 	nstring::str topic;
@@ -36,7 +36,7 @@ struct Channel
 	irc::nhash users;
 
 	// constructor
-	Channel(nstring::str&, std::time_t&);
+	Channel(nstring::str&, nstring::str&);
 	// destructor
 	virtual ~Channel();
 };

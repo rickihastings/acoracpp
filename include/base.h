@@ -9,8 +9,6 @@
 //      Please see the file COPYING for details.     //
 //                                                   //
 //===================================================//
-// $Id: base.h 697 2009-01-29 16:08:40Z ankit $
-//===================================================//
 
 #ifndef	BASE_H
 #define	BASE_H
@@ -23,11 +21,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include <boost/bind.hpp>
 #include <boost/thread.hpp>
-#include <tr1/unordered_map>
-
-#define hash_map unordered_map
-#define nspace std::tr1
 
 // the base class for all classes
 class Base

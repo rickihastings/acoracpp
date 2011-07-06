@@ -8,8 +8,6 @@
 #      Please see the file COPYING for details.     #
 #                                                   #
 #===================================================#
-# $Id: Makefile 669 2009-01-16 12:20:34Z ankit $
-#===================================================#
 
 OBJS= $(shell /bin/ls | grep '\.cpp' | grep -v svn | sed 's/\.cpp/\.o/')
 

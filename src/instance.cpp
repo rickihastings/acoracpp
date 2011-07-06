@@ -9,8 +9,6 @@
 //      Please see the file COPYING for details.     //
 //                                                   //
 //===================================================//
-// $Id: instance.cpp 708 2009-02-01 11:48:00Z ankit $
-//===================================================//
 
 #include "instance.h"
 #include "modulemanager.h"

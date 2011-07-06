@@ -52,7 +52,6 @@ irc::nhash ChannelManager::parseUsers(std::vector<nstring::str>& users)
 {
 	irc::nhash parsedUsers;
 	std::vector<nstring::str> split;
-	nstring::str tempNick, tempModes, newModes, tempPrefix, tempSuffix;
 	if (users.empty())
 		return parsedUsers;
 	// setup a new container, if users is empty just return our empty container
@@ -64,6 +63,9 @@ irc::nhash ChannelManager::parseUsers(std::vector<nstring::str>& users)
 			continue;
 		// just skip if we've got doggo info
 		
+		nstring::str tempNick = (*it);
+		nstring::str tempPrefix, tempSuffix;
+		
 		if (utils::stringIsAlphaNumerical((*it)))
 		{
 			instance->userManager->getNickFromId(*it, tempNick);
@@ -74,7 +76,7 @@ irc::nhash ChannelManager::parseUsers(std::vector<nstring::str>& users)
 		
 		if ((*it).find(",") == std::string::npos)
 		{
-			tempNick = tempModes = (*it);
+			nstring::str tempModes = tempNick;
 			tempNick.erase(std::remove_if(tempNick.begin(), tempNick.end(), utils::isNotAlnum<char>), tempNick.end());
 			instance->userManager->getNickFromId(tempNick, tempNick);
 			// get the nick
@@ -96,7 +98,7 @@ irc::nhash ChannelManager::parseUsers(std::vector<nstring::str>& users)
 	
 		utils::explode(",", *it, split);
 		instance->userManager->getNickFromId(split.at(1), tempNick);
-		newModes = split.at(0);
+		nstring::str newModes = split.at(0);
 		// get the nick etc
 		
 		for (nstring::str::iterator i = newModes.begin(); i != newModes.end(); ++i)
@@ -148,14 +150,9 @@ void ChannelManager::handleCreate(nstring::str &chan, nstring::str &ts, nstring:
 	irc::nhash oldUsers;
 	// parse up users
 	
-	std::time_t timeStamp;
-	std::istringstream stream(ts.c_str());
-	stream >> timeStamp;
-	// get the channel timestamp
-	
 	if (it == chans.end())
 	{
-		channel = new Channel(chan, timeStamp);
+		channel = new Channel(chan, ts);
 		chans.insert(std::pair<nstring::str, Channel*>(chan, channel));
 		channel->users.insert(parsedUsers.begin(), parsedUsers.end());
 		

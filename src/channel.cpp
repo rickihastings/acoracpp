@@ -17,7 +17,7 @@
 
  constructor
 */
-Channel::Channel(nstring::str &c, std::time_t &ts) :
+Channel::Channel(nstring::str &c, nstring::str &ts) :
 	name(c),
 	time(ts)
 {}

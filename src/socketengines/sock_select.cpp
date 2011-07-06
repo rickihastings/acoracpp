@@ -14,6 +14,7 @@
 #include "instance.h"
 #include "configreader.h"
 
+#include <fcntl.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
@@ -158,6 +159,8 @@ public:
 		FD_SET(fd, &set);
 		FD_ZERO(&eset);
 		FD_SET(fd, &eset);
+		
+		fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | (~O_NONBLOCK));
 
 		connected = true;
 		instance->log(NETWORK, "SelectEngine(): Connected to uplink.");
@@ -188,50 +191,33 @@ public:
 		fd_set st = set;
 		fd_set ex = eset;
 
-		int rv = select(fd + 1, &st, NULL, &ex, NULL);
-		if (rv == -1)
-		{
-			instance->finalize(nstring::str() + "select() error: " + std::strerror(errno));
-			return err::socketengine::engine;
-		}
-		else if (!rv)
-			return err::socketengine::nobuf;
+		char buf[2];
+		buf[1] = 0;
+		char ch = 0;
 
-		else if (FD_ISSET(fd, &ex))
+		while (true)
 		{
-			instance->finalize("Socket threw an exception.");
-			return err::socketengine::socket;
-		}
-		else
-		{
-			char buf[2];
-			buf[1] = 0;
-			char ch = 0;
-
-			while (true)
+			int r = ::recv(fd, buf, 1, 0);
+			if (r == -1)
 			{
-				int r = ::recv(fd, buf, 1, 0);
-				if (r == -1)
-				{
-					instance->finalize(nstring::str() + "recv() error: " + std::strerror(errno));
-					return err::socketengine::recv;
-				}
-				else if (!r)
-				{
-					instance->finalize("Remote server closed connection.");
-					return err::socketengine::closed;
-				}
-
-				if (ch == '\r' || ch == '\n')
-				{
-					ret.erase(ret.end() - 1);
-					instance->log(RAWDATA, ">>  " + ret);
-					return err::socketengine::none;
-				}
-
-				ch = buf[0];
-				ret.append(buf);
+				instance->finalize(nstring::str() + "recv() error: " + std::strerror(errno));
+				return err::socketengine::recv;
 			}
+			else if (!r)
+			{
+				instance->finalize("Remote server closed connection.");
+				return err::socketengine::closed;
+			}
+
+			if (ch == '\r' || ch == '\n')
+			{
+				ret.erase(ret.end() - 1);
+				instance->log(RAWDATA, ">>  " + ret);
+				return err::socketengine::none;
+			}
+
+			ch = buf[0];
+			ret.append(buf);
 		}
 		
 		// should never reach here o.o

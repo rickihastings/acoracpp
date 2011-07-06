@@ -19,7 +19,7 @@
 
  constructor
 */
-User::User(nstring::str &u, nstring::str &n, nstring::str &i, nstring::str &h, nstring::str& ip, nstring::str &g, nstring::str &s, std::time_t &ts) :
+User::User(nstring::str &u, nstring::str &n, nstring::str &i, nstring::str &h, nstring::str& ip, nstring::str &g, nstring::str &s, nstring::str &ts) :
     uid(u),
     nick(n),
 	oldNick(""),

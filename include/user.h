@@ -40,7 +40,7 @@ struct User
     // server
     nstring::str server;
     // connect timestamp
-    std::time_t timeStamp;
+    nstring::str timeStamp;
 	
     // oper
     bool oper;
@@ -59,7 +59,7 @@ struct User
 	std::vector<nstring::str> qChans;
 
     // constructor
-	User(nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, std::time_t&);
+	User(nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&, nstring::str&);
     // destructor
     virtual ~User();
 };
