@@ -131,8 +131,10 @@ Channel* ChannelManager::getChannel(nstring::str &chan)
 	}
 	else
 	{
-		instance->log(ERROR, "getChannel(): trying to find invalid channel, this can cause serious issues!");
-		return NULL;
+		nstring::str ts = utils::toStr(instance->now);
+		Channel* channel = new Channel(chan, ts);
+		chans.insert(std::pair<nstring::str, Channel*>(chan, channel));
+		return channel;
 	}
 	// find the channel class from our channel map
 }

@@ -21,6 +21,7 @@
 #include "usermanager.h"
 #include "channelmanager.h"
 
+#include <algorithm>
 #include <deque>
 
 // a charybdis server

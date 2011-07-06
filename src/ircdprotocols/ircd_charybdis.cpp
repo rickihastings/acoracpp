@@ -13,8 +13,6 @@
 #include "instance.h"
 #include "ircd_charybdis.h"
 
-#include <algorithm>
-
 // IRCD COMMANDS
 
 // :<source> PING :<reply>
@@ -450,7 +448,7 @@ void charybdisProtocol::initServer()
 	// PASS <password> TS 6 :<sid>
 	instance->socketEngine->sendString("PASS " + instance->configReader->getValue<nstring::str>("remoteserver", "password", nstring::str()) + " TS 6 :" + sid);
 	// CAPAB :<supported capab>
-	instance->socketEngine->sendString("CAPAB :QS EX CHW IE KLN KNOCK TB UNKLN CLUSTER ENCAP SERVICES RSFNC SAVE EUID EOPMOD BAN MLOCK");
+	instance->socketEngine->sendString("CAPAB :QS EX CHW IE KLN KNOCK TB UNKLN ENCAP SERVICES RSFNC SAVE EUID EOPMOD BAN");
 	// SERVER <servername> <hopcount> :<description>
 	instance->socketEngine->sendString("SERVER " + instance->configReader->getValue<nstring::str>("server", "name", nstring::str()) + " 0 :" + instance->configReader->getValue<nstring::str>("server", "desc", nstring::str()));
 }
